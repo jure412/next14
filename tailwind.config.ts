@@ -2,8 +2,8 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: [
-    "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
-    "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/app/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
@@ -19,15 +19,16 @@ const config: Config = {
       current: "currentColor",
       black: "#000",
       white: "#fff",
+      background: "#a8bfa4",
       primary: {
         light: "#a8dadc",
         dark: "#457b9d",
         inactive: "#e8f1f2",
       },
       secondary: {
-        light: "#f1faee",
-        dark: "#a8bfa4",
-        inactive: "#f7faf7",
+        light: "#e6e6ff",
+        dark: "#9999cc",
+        inactive: "#f2f2ff",
       },
       accent: {
         light: "#ff7f40",
@@ -50,9 +51,9 @@ const config: Config = {
         inactive: "#bfe8f2",
       },
       success: {
-        light: "#5ac200",
-        dark: "#116600",
-        inactive: "#d8e6bf",
+        light: "#e9f8cb",
+        dark: "#a3c293",
+        inactive: "#f1f8e4",
       },
       warning: {
         light: "#e6b640",
@@ -66,15 +67,28 @@ const config: Config = {
       },
     },
     spacing: {
-      1: "8px",
-      2: "12px",
-      3: "16px",
-      4: "24px",
-      5: "32px",
-      6: "48px",
+      1: "1px",
+      2: "2px",
+      3: "4px",
+      4: "6px",
+      5: "8px",
+      6: "12px",
+      7: "16px",
+      8: "24px",
+      9: "32px",
+      10: "40px",
+      11: "48px",
+      12: "-1px",
+      13: "64px",
+      14: "96px",
     },
     // ...
     extend: {
+      boxShadow: {
+        primary:
+          "0 10px 15px 0px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.4)",
+        none: "unset",
+      },
       opacity: {
         "80": ".8",
       },
