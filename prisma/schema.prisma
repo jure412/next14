@@ -10,18 +10,41 @@ datasource db {
 
 model User {
   id       String   @id @default(cuid())
-  username String   @unique
+  username String   
   email    String   @unique
-  googleId String?  
-  profileImageUrl String?
-  hashedPassword String
-  emailVerified Boolean
+  googleId String?  @default("")
+  profileImageUrl String? 
+  hashedPassword String?
+  emailVerified Boolean @default(false)
   sessions Session[]
+  emailVerification EmailVerification[]
+  oAuth OAauth[]
 }
 
 model Session {
   id        String   @id
-  userId    String   @default(cuid())
+  userId    String   
   expiresAt DateTime
   user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
 }
+
+
+model EmailVerification {
+  id        String    @id @default(cuid())
+  userId    String    @unique
+  code      String
+  sentAt    DateTime
+  user      User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+}
+
+model OAauth {
+  id           String   @id @default(cuid())
+  userId       String
+  provider     String
+  providerUserId   String
+  refreshToken String
+  accessToken  String
+  expiresAt    DateTime
+  user         User     @relation(references: [id], fields: [userId], onDelete: Cascade)
+}
+
