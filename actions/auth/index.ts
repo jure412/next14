@@ -142,7 +142,6 @@ export const signUp = async (values: any) => {
       msg: ["Email has been sent to you. Please verify your email."],
     };
   } catch (error) {
-    console.log(error);
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return { msg: ["Unvalid field"], success: false };
     } else {
@@ -216,7 +215,6 @@ export const signIn = async (values: any) => {
       msg: ["Unvalid credentials"],
     };
   } catch (error) {
-    console.log(error);
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return { msg: ["Unvalid field."], success: false };
     } else {
@@ -267,7 +265,6 @@ export const createGoogleAuthorizationURL = async () => {
         scopes: ["email", "profile"],
       }
     );
-    // console.log(authorizationURL);
     return {
       success: true,
       msg: ["Authorization URL created successfully."],

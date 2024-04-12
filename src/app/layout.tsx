@@ -21,7 +21,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const sessionData = await validateRequest();
-  console.log(sessionData);
   return (
     <html lang="en">
       <body className={`inter.className bg-background relative`}>

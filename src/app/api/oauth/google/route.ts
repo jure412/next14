@@ -29,8 +29,6 @@ export const GET = async (req: NextRequest) => {
     const codeVerifier = cookies().get("codeVerifier")?.value;
     const savedState = cookies().get("state")?.value;
 
-    console.log({ codeVerifier, savedState, state });
-
     if (!codeVerifier || !savedState) {
       return Response.json({
         msg: ["Code verifier or saved state is not exists"],
@@ -61,7 +59,6 @@ export const GET = async (req: NextRequest) => {
     const googleData = (await googleRes.json()) as GoogleUser;
 
     let userId: string = "";
-    console.log("google data", googleData);
     await prisma.$transaction(async (prisma) => {
       const user = await prisma.user.findFirst({
         where: { email: googleData.email },
