@@ -4,20 +4,19 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import { AiOutlineClose } from "react-icons/ai";
 import Link from "../Link";
-import { LinkVariant } from "./index.types";
+import { LinkVariant } from "../Link/index.types";
 
 export default function Modal({
   linkType,
   linkChildren,
-  HeaderChildren,
   children,
 }: React.PropsWithChildren<{
   linkChildren: React.ReactNode;
-  HeaderChildren: React.ReactNode;
   linkType: LinkVariant;
 }>) {
   const [mounted, setMounted] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
+  const [header, setHeader] = React.useState(null);
 
   React.useEffect(() => setMounted(true), []);
 
@@ -33,9 +32,15 @@ export default function Modal({
                 <AiOutlineClose />
               </Link>
               <div className="flex items-end pt-6 pl-6 gap-8 pr-14">
-                {HeaderChildren}
+                {header}
               </div>
-              <div className="p-6">{children}</div>
+              <div className="p-6">
+                {React.cloneElement(children as React.ReactElement, {
+                  isOpen,
+                  setIsOpen,
+                  setHeader,
+                })}
+              </div>
             </div>
           </div>,
           document.body
