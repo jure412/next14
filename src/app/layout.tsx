@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import { validateRequest } from "../../utils/auth";
 import "./globals.css";
 import Header from "./modules/Header";
-import { SessionProvider } from "./providers/Session.provider";
-
-const inter = Inter({ subsets: ["latin"] });
+import Provider from "./providers/index.provider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -21,14 +18,15 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const sessionData = await validateRequest();
+
   return (
     <html lang="en">
       <body className={`inter.className bg-background relative`}>
-        <SessionProvider value={sessionData}>
+        <Provider sessionData={sessionData}>
           <Header />
           {children}
           <ToastContainer />
-        </SessionProvider>
+        </Provider>
       </body>
     </html>
   );

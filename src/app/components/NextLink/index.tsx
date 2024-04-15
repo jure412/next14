@@ -12,7 +12,7 @@ const NextLink: React.FC<PropsWithChildren<LinkCustomProps>> = ({
 }) => {
   return (
     <Link {...rest}>
-      <LinkEl disabled className={className} variant={LinkVariant.PRIMARY}>
+      <LinkEl disabled className={className} variant={variant}>
         {children}
       </LinkEl>
     </Link>
