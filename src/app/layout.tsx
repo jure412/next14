@@ -21,10 +21,12 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`inter.className bg-background relative`}>
+      <body className={`bg-background relative`}>
         <Provider sessionData={sessionData}>
-          <Header />
-          {children}
+          <div className="2xl:container 2xl:mx-auto px-4">
+            <Header />
+            {children}
+          </div>
           <ToastContainer />
         </Provider>
       </body>
