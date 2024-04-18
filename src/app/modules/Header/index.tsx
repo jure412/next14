@@ -22,7 +22,7 @@ const Header: React.FC = async () => {
           {user ? (
             <>
               <NextLink variant={LinkVariant.SECONDARY} href="/drawings">
-                Drawing
+                Drawings
               </NextLink>
               <NextLink variant={LinkVariant.SECONDARY} href="/protected">
                 Protected
