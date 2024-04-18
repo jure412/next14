@@ -14,13 +14,16 @@ const Header: React.FC = async () => {
   const { user } = await validateRequest();
   return (
     <header>
-      <div className="container mx-auto px-4 h-13 flex items-center justify-between">
+      <div className="h-13 flex items-center justify-between">
         <NextLink variant={LinkVariant.PRIMARY} href="/">
           <CiAirportSign1 size={50} />
         </NextLink>
         <div className="flex gap-8 items-center">
           {user ? (
             <>
+              <NextLink variant={LinkVariant.SECONDARY} href="/drawings">
+                Drawing
+              </NextLink>
               <NextLink variant={LinkVariant.SECONDARY} href="/protected">
                 Protected
               </NextLink>
