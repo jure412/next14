@@ -11,6 +11,9 @@ const nextConfig = {
     domains: ["http://localhost:3000"],
     unoptimized: true,
   },
+  env: {
+    NEXTAUTH_URL_INTERNAL: process.env.NEXTAUTH_URL_INTERNAL,
+  },
 };
 
 export default nextConfig;

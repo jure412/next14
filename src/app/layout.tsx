@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import { validateRequest } from "../../utils/auth";
 import "./globals.css";
 import Header from "./modules/Header";
+import { PrefetchData } from "./providers/PrefetchData.provider";
 import Provider from "./providers/index.provider";
 
 export const metadata: Metadata = {
@@ -17,17 +17,20 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const sessionData = await validateRequest();
-
   return (
     <html lang="en">
-      <body className={`bg-background relative`}>
-        <Provider sessionData={sessionData}>
-          <div className="2xl:container 2xl:mx-auto px-4">
-            <Header />
-            {children}
-          </div>
-          <ToastContainer />
+      <body
+        suppressHydrationWarning={true}
+        className={`bg-background relative`}
+      >
+        <Provider>
+          <PrefetchData>
+            <div className="2xl:container 2xl:mx-auto px-4">
+              <Header />
+              {children}
+            </div>
+            <ToastContainer />
+          </PrefetchData>
         </Provider>
       </body>
     </html>

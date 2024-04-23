@@ -1,28 +1,26 @@
 "use client";
 
-import { useSession } from "@/app/providers/Session.provider";
-import { useQuery } from "react-query";
-import { protectedQuery } from "../../../../actions/protected";
+import { getMe } from "@/app/helpers/queries";
+import { useQuery } from "@tanstack/react-query";
+import { FaSpinner } from "react-icons/fa";
 
 export default function ClientUser() {
-  const { user } = useSession();
-  const { data, isLoading, isError } = useQuery("myData", () =>
-    protectedQuery()
+  const { data, isLoading } = useQuery({
+    queryKey: ["getMe"],
+    queryFn: getMe,
+  });
+  return (
+    <>
+      {isLoading ? (
+        <FaSpinner size={20} className="spinner-icon animate-spin" />
+      ) : data?.isAuth ? (
+        <div>
+          <h1>Welcoda {data?.data?.user?.username}</h1>
+          <h2>Your email is {data?.data?.user?.email}</h2>
+        </div>
+      ) : (
+        <h1>Welcome to the app</h1>
+      )}
+    </>
   );
-
-  console.log(data, isLoading, isError);
-
-  if (isLoading)
-    return (
-      <div>
-        <h1>Loading...</h1>
-      </div>
-    );
-  else
-    return (
-      <div>
-        <h1>Client User</h1>
-        {JSON.stringify(user)}
-      </div>
-    );
 }

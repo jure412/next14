@@ -1,13 +1,15 @@
 import Button from "./components/Button";
 import { ButtonVariant } from "./components/Button/index.types";
+import { LinkVariant } from "./components/Link/index.types";
 import Link from "./components/NextLink";
-import { LinkVariant } from "./components/NextLink/index.types";
 import Typography from "./components/Typography";
+import ClientUser from "./modules/ClientUser";
 
-export default function Home() {
+export default async function Home() {
   return (
-    <div>
+    <>
       <div className="container mx-auto px-6 py-8">
+        <ClientUser />
         <Typography h1>Heading 1</Typography>
         <Typography h2>heading 2</Typography>
         <Typography h3>heading 3</Typography>
@@ -61,6 +63,6 @@ export default function Home() {
           Link
         </Link>
       </div>
-    </div>
+    </>
   );
 }
