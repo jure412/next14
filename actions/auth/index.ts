@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 import { generateId } from "lucia";
 import { cookies } from "next/headers";
 import { prisma } from "../../prisma/prismaClient";
-import { lucia, validateRequest } from "../../utils/auth";
+import { lucia } from "../../utils/auth";
 import { sendEmail } from "../../utils/email";
 import { google } from "../../utils/oauth";
 import { SignInSchema, SignUpSchema } from "./index.types";
@@ -201,11 +201,14 @@ export const signIn = async (values: any) => {
           sessionCookie.value,
           sessionCookie.attributes
         );
+        // revalidateTag("getMe");
+
         return {
           success: true,
           msg: ["User logged in successfully."],
           data: {
             ...user,
+            sessionId: sessionCookie.value,
           },
         };
       }
@@ -225,13 +228,14 @@ export const signIn = async (values: any) => {
 
 export const signOut = async () => {
   try {
-    const { session } = await validateRequest();
+    let sessionId: string =
+      cookies().get(lucia.sessionCookieName)?.value ?? null;
 
-    if (!session) {
+    if (!sessionId) {
       return { msg: ["Unauthorized."], success: false };
     }
 
-    await lucia.invalidateSession(session.id);
+    await lucia.invalidateSession(sessionId);
 
     const sessionCookie = lucia.createBlankSessionCookie();
 
@@ -240,6 +244,11 @@ export const signOut = async () => {
       sessionCookie.value,
       sessionCookie.attributes
     );
+
+    return {
+      success: true,
+      msg: ["User logged out successfully."],
+    };
   } catch (error: any) {
     return { msg: [error?.message], success: false };
   }
