@@ -2,7 +2,7 @@ import Button from "./components/Button";
 import { ButtonVariant } from "./components/Button/index.types";
 import CustomImage from "./components/CustomImage";
 import { LinkVariant } from "./components/Link/index.types";
-import Link from "./components/NextLink";
+import NextLink from "./components/NextLink";
 import Typography from "./components/Typography";
 import ClientUser from "./modules/ClientUser";
 
@@ -64,12 +64,12 @@ export default async function Home() {
         </Button>
       </div>
       <div className="flex my-8 gap-4">
-        <Link legacyBehavior href="/">
-          Link
-        </Link>
-        <Link variant={LinkVariant.SECONDARY} legacyBehavior href="/">
-          Link
-        </Link>
+        <NextLink prefetch href="/">
+          NextLink
+        </NextLink>
+        <NextLink prefetch variant={LinkVariant.SECONDARY} href="/">
+          NextLink
+        </NextLink>
       </div>
     </>
   );
