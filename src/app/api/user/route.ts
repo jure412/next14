@@ -1,4 +1,3 @@
-import { Prisma } from "@prisma/client";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { lucia } from "../../../../utils/auth";
@@ -8,14 +7,12 @@ export const GET = async () => {
     let sessionId: string =
       cookies().get(lucia.sessionCookieName)?.value ?? null;
     if (!sessionId) {
-      return NextResponse.json({
-        msg: ["User not found."],
-        success: true,
-        isAuth: false,
-        data: null,
-      });
+      throw new Error("Unauthorized");
     }
     const { user, session } = await lucia.validateSession(sessionId);
+    if (!user || !session) {
+      throw new Error("Unauthorized");
+    }
 
     if (session && session.fresh) {
       const sessionCookie = lucia.createSessionCookie(session.id);
@@ -40,13 +37,10 @@ export const GET = async () => {
       data: { user, session },
     });
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return NextResponse.json({ msg: ["Prisma Error"], success: false });
-    } else {
-      return NextResponse.json({
-        msg: [error.message],
-        success: false,
-      });
-    }
+    return NextResponse.json({
+      msg: [error.message],
+      success: false,
+      isAuth: false,
+    });
   }
 };

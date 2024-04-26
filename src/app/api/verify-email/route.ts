@@ -1,18 +1,14 @@
-import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import { NextRequest } from "next/server";
 
 import { cookies } from "next/headers";
+import { prisma } from "../../../../prisma/prismaClient";
 import { lucia } from "../../../../utils/auth";
-
-const prisma = new PrismaClient();
 
 export const GET = async (req: NextRequest) => {
   try {
     const url = new URL(req.url);
-
     const searchParams = url.searchParams;
-
     const token = searchParams.get("token");
 
     if (!token) {
@@ -67,7 +63,7 @@ export const GET = async (req: NextRequest) => {
     );
 
     return Response.redirect(new URL(process.env.NEXTAUTH_URL_INTERNAL!), 302);
-  } catch (e: any) {
-    return Response.json({ msg: [e.message], success: false });
+  } catch (error) {
+    return Response.json({ msg: [error.message], success: false });
   }
 };

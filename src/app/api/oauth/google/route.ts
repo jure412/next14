@@ -23,24 +23,18 @@ export const GET = async (req: NextRequest) => {
     const state = searchParams.get("state");
 
     if (!code || !state) {
-      return Response.json({ msg: ["Invalid request"], success: false });
+      throw new Error("Invalid request");
     }
 
     const codeVerifier = cookies().get("codeVerifier")?.value;
     const savedState = cookies().get("state")?.value;
 
     if (!codeVerifier || !savedState) {
-      return Response.json({
-        msg: ["Code verifier or saved state is not exists"],
-        success: false,
-      });
+      throw new Error("Code verifier or saved state is not exists");
     }
 
     if (savedState !== state) {
-      return Response.json({
-        msg: ["State does not match"],
-        success: false,
-      });
+      throw new Error("State does not match");
     }
 
     const { accessToken, idToken, accessTokenExpiresAt, refreshToken } =
@@ -154,7 +148,7 @@ export const GET = async (req: NextRequest) => {
         status: 302,
       }
     );
-  } catch (error: any) {
+  } catch (error) {
     return Response.json({
       msg: [error.message],
       success: false,
