@@ -1,26 +1,29 @@
 "use client";
 
-import { getMe } from "@/app/helpers/queries";
+import Typography from "@/app/components/Typography";
+import { getMe } from "@/app/helpers/queries/index.client";
 import { useQuery } from "@tanstack/react-query";
 import { FaSpinner } from "react-icons/fa";
 
 export default function ClientUser() {
   const { data, isLoading } = useQuery({
     queryKey: ["getMe"],
-    queryFn: getMe,
+    queryFn: () => getMe(),
   });
   return (
-    <>
+    <div className="w-fit	 bg-white rounded-lg shadow-primary overflow-hidden my-3">
       {isLoading ? (
         <FaSpinner size={20} className="spinner-icon animate-spin" />
       ) : data?.isAuth ? (
-        <div>
-          <h1>Welcoda {data?.data?.user?.username}</h1>
-          <h2>Your email is {data?.data?.user?.email}</h2>
+        <div className="p-8">
+          <Typography h3>Welcome {data?.data?.user?.username}</Typography>
+          <Typography p>{data?.data?.user?.email}</Typography>
         </div>
       ) : (
-        <h1>Welcome to the app</h1>
+        <Typography className="p-8" h3>
+          Welcome to the app
+        </Typography>
       )}
-    </>
+    </div>
   );
 }
