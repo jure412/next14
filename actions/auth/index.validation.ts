@@ -1,7 +1,6 @@
-import { PrismaClient } from "@prisma/client";
 import { z } from "zod";
+import { prisma } from "../../prisma/prismaClient";
 
-const prisma = new PrismaClient();
 export const SignUpSchema = z
   .object({
     email: z
@@ -35,4 +34,11 @@ export const SignInSchema = z.object({
   password: z
     .string()
     .min(8, { message: "Password must be at least 8 characters long" }),
+});
+
+export const EmailVerificationSchema = z.object({
+  email: z
+    .string()
+    .min(1, "This field has to be filled.")
+    .email("This is not a valid email."),
 });

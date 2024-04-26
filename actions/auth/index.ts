@@ -1,5 +1,5 @@
 "use server";
-import { Prisma } from "@prisma/client";
+import { Values } from "@/app/modules/ModalContent/index.types";
 import { generateCodeVerifier, generateState } from "arctic";
 import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
@@ -9,10 +9,27 @@ import { prisma } from "../../prisma/prismaClient";
 import { lucia } from "../../utils/auth";
 import { sendEmail } from "../../utils/email";
 import { google } from "../../utils/oauth";
-import { SignInSchema, SignUpSchema } from "./index.types";
+import {
+  EmailVerificationSchema,
+  SignInSchema,
+  SignUpSchema,
+} from "./index.validation";
 
 export const resendVerificationEmail = async (email: string) => {
   try {
+    const validationRes: any = await EmailVerificationSchema.safeParseAsync({
+      email,
+    });
+
+    if (!validationRes.success) {
+      const validationErrors =
+        validationRes?.error?.errors.map(
+          ({ message }: { message: string }) => message
+        ) || [];
+
+      return { msg: validationErrors, success: false };
+    }
+
     const existingUser = await prisma.user.findUnique({
       where: {
         email,
@@ -20,11 +37,11 @@ export const resendVerificationEmail = async (email: string) => {
     });
 
     if (!existingUser) {
-      return { msg: ["User not found"], success: false };
+      throw new Error("User not found.");
     }
 
     if (existingUser.emailVerified) {
-      return { msg: ["Email already verified"], success: false };
+      throw new Error("Email already verified.");
     }
 
     const existedCode = await prisma.emailVerification.findFirst({
@@ -32,7 +49,7 @@ export const resendVerificationEmail = async (email: string) => {
     });
 
     if (!existedCode) {
-      return { msg: ["Code not found"], success: false };
+      throw new Error("Code not found.");
     }
 
     const sentAt = new Date(existedCode.sentAt);
@@ -40,15 +57,11 @@ export const resendVerificationEmail = async (email: string) => {
       new Date().getTime() - sentAt.getTime() > 60000; // 1 minute
 
     if (!isOneMinuteHasPassed) {
-      return {
-        msg: [
-          "Email already sent next email in " +
-            (60 -
-              Math.floor((new Date().getTime() - sentAt.getTime()) / 1000)) +
-            " seconds",
-        ],
-        success: false,
-      };
+      throw new Error(
+        "Email already sent next email in " +
+          (60 - Math.floor((new Date().getTime() - sentAt.getTime()) / 1000)) +
+          " seconds"
+      );
     }
 
     const code = Math.random().toString(36).substring(2, 8);
@@ -78,46 +91,42 @@ export const resendVerificationEmail = async (email: string) => {
     });
 
     return {
-      success: true,
       msg: ["Email resent"],
+      success: true,
     };
-  } catch (error: any) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return { msg: ["Prisma Error"], success: false };
-    } else {
-      return { msg: ["An unknown error occurred."], success: false };
-    }
+  } catch (error) {
+    return { msg: [error.message], success: false };
   }
 };
 
-export const signUp = async (values: any) => {
-  const hashedPassword = await argon2.hash(values.password);
+export const signUp = async (values: Values) => {
   try {
-    const validationRes = await SignUpSchema.safeParseAsync({
+    const hashedPassword = await argon2.hash(values.password);
+    const validationRes: any = await SignUpSchema.safeParseAsync({
       ...values,
     });
 
     if (!validationRes.success) {
-      const validationErrors = validationRes.error.errors.map(
-        ({ message }: { message: string }) => message
-      );
+      const validationErrors =
+        validationRes?.error?.errors.map(
+          ({ message }: { message: string }) => message
+        ) || [];
       return { msg: validationErrors, success: false };
     }
 
+    const code = Math.random().toString(36).substring(2, 8);
     const user = await prisma.user.create({
       data: {
         username: values.username,
         email: values.email,
         hashedPassword,
-      },
-    });
-    const code = Math.random().toString(36).substring(2, 8);
-    const ev = await prisma.emailVerification.create({
-      data: {
-        id: generateId(15),
-        code,
-        userId: user.id,
-        sentAt: new Date(),
+        emailVerification: {
+          create: {
+            id: generateId(15),
+            code,
+            sentAt: new Date(),
+          },
+        },
       },
     });
 
@@ -142,22 +151,18 @@ export const signUp = async (values: any) => {
       msg: ["Email has been sent to you. Please verify your email."],
     };
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return { msg: ["Unvalid field"], success: false };
-    } else {
-      return { msg: ["An unknown error occurred."], success: false };
-    }
+    return { msg: [error.message], success: false };
   }
 };
 
 export const signIn = async (values: any) => {
   try {
-    const validationRes = await SignInSchema.safeParseAsync({
+    const validationRes: any = await SignInSchema.safeParseAsync({
       ...values,
     });
 
     if (!validationRes.success) {
-      const validationErrors = validationRes.error.errors.map(
+      const validationErrors = validationRes?.error?.errors.map(
         ({ message }: { message: string }) => message
       );
       return { msg: validationErrors, success: false };
@@ -169,60 +174,47 @@ export const signIn = async (values: any) => {
       },
     });
 
-    if (user) {
-      if (!user.emailVerified) {
-        return {
-          success: false,
-          msg: ["Email not verified. Please verify your email."],
-        };
-      }
-      if (!user.hashedPassword) {
-        return {
-          success: false,
-          msg: ["Unvalid credentials."],
-        };
-      }
-      const isValidPassword = await argon2.verify(
-        user?.hashedPassword!,
-        values.password
-      );
-      if (isValidPassword) {
-        const userId = user?.id;
-        const currentDate = new Date();
-        currentDate.setDate(currentDate.getDate() + 3);
-        const session = await lucia.createSession(userId, {
-          expiresAt: currentDate,
-        });
-
-        const sessionCookie = lucia.createSessionCookie(session.id);
-
-        cookies().set(
-          sessionCookie.name,
-          sessionCookie.value,
-          sessionCookie.attributes
-        );
-        // revalidateTag("getMe");
-
-        return {
-          success: true,
-          msg: ["User logged in successfully."],
-          data: {
-            ...user,
-            sessionId: sessionCookie.value,
-          },
-        };
-      }
+    if (!user) {
+      throw new Error("Unvalid credentials");
     }
+
+    if (!user.emailVerified) {
+      throw new Error("Email not verified. Please verify your email.");
+    }
+
+    const isValidPassword = await argon2.verify(
+      user?.hashedPassword!,
+      values.password
+    );
+
+    if (!isValidPassword) {
+      throw new Error("Unvalid credentials.");
+    }
+    const userId = user?.id;
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + 3);
+    const session = await lucia.createSession(userId, {
+      expiresAt: currentDate,
+    });
+
+    const sessionCookie = lucia.createSessionCookie(session.id);
+
+    cookies().set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes
+    );
+
     return {
-      success: false,
-      msg: ["Unvalid credentials"],
+      success: true,
+      msg: ["User logged in successfully."],
+      data: {
+        ...user,
+        sessionId: sessionCookie.value,
+      },
     };
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return { msg: ["Unvalid field."], success: false };
-    } else {
-      return { msg: ["An unknown error occurred."], success: false };
-    }
+    return { msg: [error.message], success: false };
   }
 };
 
@@ -232,7 +224,7 @@ export const signOut = async () => {
       cookies().get(lucia.sessionCookieName)?.value ?? null;
 
     if (!sessionId) {
-      return { msg: ["Unauthorized."], success: false };
+      throw new Error("Unauthorized");
     }
 
     await lucia.invalidateSession(sessionId);
@@ -249,7 +241,7 @@ export const signOut = async () => {
       success: true,
       msg: ["User logged out successfully."],
     };
-  } catch (error: any) {
+  } catch (error) {
     return { msg: [error?.message], success: false };
   }
 };
@@ -274,12 +266,16 @@ export const createGoogleAuthorizationURL = async () => {
         scopes: ["email", "profile"],
       }
     );
+
+    if (!authorizationURL) {
+      throw new Error("Failed to create authorization URL.");
+    }
     return {
       success: true,
       msg: ["Authorization URL created successfully."],
       data: authorizationURL.href,
     };
-  } catch (error: any) {
+  } catch (error) {
     return { msg: [error?.message], success: false };
   }
 };
