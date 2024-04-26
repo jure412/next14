@@ -3,7 +3,7 @@ import { FaSpinner } from "react-icons/fa";
 
 const LoadingPage: FC = () => {
   return (
-    <div className="flex justify-center items-center min-h-screen">
+    <div className="fixed inset-0 flex items-center justify-center">
       <FaSpinner size={100} className="spinner-icon animate-spin" />
     </div>
   );
