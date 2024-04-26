@@ -1,11 +1,10 @@
 "use server";
-
 import { saveBase64ImageToFile } from "@/app/helpers/functions/server";
 import { NewDrawingsValuesProps } from "@/app/modules/ModalContent/index.types";
 import { User } from "lucia";
 import { cookies } from "next/headers";
 import { prisma } from "../../prisma/prismaClient";
-import { NewDrawingSchema, SaveDrawingsSchema } from "./index.validation";
+import { NewDrawingSchema } from "./index.validation";
 
 export const newDrawing = async ({ name, users }: NewDrawingsValuesProps) => {
   try {
@@ -86,18 +85,9 @@ export const newDrawing = async ({ name, users }: NewDrawingsValuesProps) => {
 export const saveDrawings = async (formData: FormData) => {
   try {
     const canvas: any = formData.get("canvas");
-    const drawignId = formData.get("drawingId")! as string;
-
-    const validationRes: any = await SaveDrawingsSchema.safeParseAsync({
-      canvas,
-      drawignId,
-    });
-
-    if (!validationRes.success) {
-      const validationErrors = validationRes.error.errors.map(
-        ({ message }: { message: string }) => message
-      );
-      return { msg: validationErrors, success: false };
+    const drawignId: any = formData.get("drawingId");
+    if (!canvas || !drawignId) {
+      throw new Error("Something is wrong.");
     }
 
     const imagePath: string | null = canvas

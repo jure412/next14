@@ -12,8 +12,3 @@ export const NewDrawingSchema = z.object({
       }
     ),
 });
-
-export const SaveDrawingsSchema = z.object({
-  canvas: z.string(),
-  drawingId: z.string().min(1, "Unvalid drawing id"),
-});
