@@ -28,7 +28,7 @@ const Header: React.FC = () => {
   return (
     <header>
       <div className="h-14 flex items-center justify-between">
-        <NextLink variant={LinkVariant.PRIMARY} href="/">
+        <NextLink variant={LinkVariant.PRIMARY} href="/" prefetch={false}>
           <CiAirportSign1 size={50} />
         </NextLink>
         <div className="flex gap-8 items-center">
@@ -36,7 +36,11 @@ const Header: React.FC = () => {
             <FaSpinner size={20} className="spinner-icon animate-spin" />
           ) : data?.data?.user ? (
             <>
-              <NextLink variant={LinkVariant.SECONDARY} href="/drawings">
+              <NextLink
+                prefetch={false}
+                variant={LinkVariant.SECONDARY}
+                href="/drawings"
+              >
                 Drawings
               </NextLink>
               <form action={handleSingOut}>
