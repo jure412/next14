@@ -1,9 +1,11 @@
-import type { NextFetchEvent, NextRequest } from "next/server";
-import { NextResponse } from "next/server";
-
-export async function middleware(req: NextRequest, event: NextFetchEvent) {
+import { cookies } from "next/headers";
+import { NextRequest, NextResponse } from "next/server";
+export async function middleware(req: NextRequest) {
   const response = NextResponse.next();
   const pathname = req.nextUrl.pathname;
-  response.headers.set("x-pathname", pathname);
+  const cookieExists = cookies().get("auth_session");
+  if (!cookieExists && pathname.startsWith("/drawings")) {
+    return NextResponse.redirect(process.env.NEXTAUTH_URL_INTERNAL + "/");
+  }
   return response;
 }
