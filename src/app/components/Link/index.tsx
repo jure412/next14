@@ -30,8 +30,9 @@ const Link: React.FC<PropsWithChildren<LinkExtendedProps>> = ({
       className={`
           ${classNameVariant} 
           ${className} 
+          will-change-transform
           transition-transform duration-100
-          hover:-translate-x-12 active:-translate-x-1
+          hover:-translate-y-1 active:-translate-y-0
           cursor-pointer	
         `}
     >
