@@ -13,9 +13,9 @@ const Button: React.FC<PropsWithChildren<ButtonProps>> = ({
 }) => {
   const disabledBtn = disabled || loading;
 
-  const commonClassName = `flex items-center justify-center rounded focus:outline-none transition-all duration-200 shadow-primary ${
+  const commonClassName = `will-change-transform flex items-center justify-center rounded focus:outline-none transition-all duration-200 shadow-primary ${
     !disabledBtn
-      ? "hover:-translate-y-12 active:-translate-y-1 hover:shadow active:shadow-primary"
+      ? "hover:-translate-y-1 active:-translate-y-1 hover:shadow active:shadow-primary"
       : ""
   }`;
   let classNameSize = "";
@@ -27,7 +27,7 @@ const Button: React.FC<PropsWithChildren<ButtonProps>> = ({
       classNameSize = "h-11 px-5 text-lg";
       break;
     default:
-      classNameSize = "h-10 px-6 text-base";
+      classNameSize = "h-13 px-6 text-base";
       break;
   }
 
