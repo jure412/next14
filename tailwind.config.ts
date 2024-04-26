@@ -67,20 +67,21 @@ const config: Config = {
       },
     },
     spacing: {
-      1: "1px",
-      2: "2px",
-      3: "4px",
-      4: "6px",
-      5: "8px",
-      6: "12px",
-      7: "16px",
-      8: "24px",
+      1: "2px",
+      2: "4px",
+      3: "8px",
+      4: "12px",
+      5: "16px",
+      6: "20px",
+      7: "24px",
+      8: "28px",
       9: "32px",
-      10: "40px",
-      11: "48px",
-      12: "-1px",
-      13: "64px",
-      14: "96px",
+      10: "36px",
+      11: "40px",
+      12: "44px",
+      13: "48px",
+      14: "72px",
+      15: "96px",
     },
     // ...
     extend: {
@@ -97,12 +98,6 @@ const config: Config = {
       },
     },
   },
-  // variants: {
-  //   extend: {
-  //     borderColor: ["focus-visible"],
-  //     opacity: ["disabled"],
-  //   },
-  // },
   plugins: [],
 };
 export default config;
