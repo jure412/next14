@@ -40,7 +40,7 @@ const NewDrawing: React.FC<AuthenticationProps> = ({
 
   const queryClient = useQueryClient();
 
-  const { mutate } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: newDrawing,
     onMutate: async (values: NewDrawingsValuesProps) => {
       await queryClient.cancelQueries({ queryKey: ["getDrawings"] });
@@ -158,7 +158,7 @@ const NewDrawing: React.FC<AuthenticationProps> = ({
             );
           })}
         </div>
-        <Button className="mt-8" type="submit">
+        <Button loading={isPending || loading} className="mt-8" type="submit">
           Submit
         </Button>
       </form>
