@@ -4,6 +4,7 @@ import { ButtonVariant } from "@/app/components/Button/index.types";
 import Input from "@/app/components/Input";
 import Link from "@/app/components/Link";
 import Typography from "@/app/components/Typography";
+import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { AiOutlineLogin } from "react-icons/ai";
@@ -24,8 +25,8 @@ const singUpValues: Values = {
 };
 
 const singInValues: Values = {
-  password: "",
-  email: "",
+  password: "12345678",
+  email: "jur3curk+1@gmail.com",
 };
 
 const ResendValues: Values = {
@@ -36,6 +37,8 @@ const Authentication: React.FC<AuthenticationProps> = ({
   setIsOpen,
   setHeader,
 }) => {
+  const queryClient = useQueryClient();
+
   const [step, setStep] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const methods = useForm<Values>({
@@ -45,7 +48,7 @@ const Authentication: React.FC<AuthenticationProps> = ({
 
   const onSubmit = async (values: Values) => {
     setLoading(true);
-    const response =
+    const response: any =
       step === 1
         ? await signIn(values)
         : step === 2
@@ -54,6 +57,7 @@ const Authentication: React.FC<AuthenticationProps> = ({
     if (response.success) {
       toast.success(response?.msg?.[0]);
       setIsOpen?.(false);
+      queryClient.invalidateQueries({ queryKey: ["getMe"] });
     } else {
       response.msg?.forEach((msg: string) => {
         toast.error(msg);

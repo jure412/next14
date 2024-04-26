@@ -18,3 +18,9 @@ export interface AuthenticationProps {
   setIsOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   setHeader?: React.Dispatch<React.SetStateAction<React.ReactNode>>;
 }
+
+export interface NewDrawingsValuesProps {
+  name: string;
+  email?: string;
+  users: string[] | [];
+}
