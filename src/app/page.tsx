@@ -1,5 +1,6 @@
 import Button from "./components/Button";
 import { ButtonVariant } from "./components/Button/index.types";
+import CustomImage from "./components/CustomImage";
 import { LinkVariant } from "./components/Link/index.types";
 import Link from "./components/NextLink";
 import Typography from "./components/Typography";
@@ -8,7 +9,7 @@ import ClientUser from "./modules/ClientUser";
 export default async function Home() {
   return (
     <>
-      <div className="container mx-auto px-6 py-8">
+      <div className="my-8">
         <ClientUser />
         <Typography h1>Heading 1</Typography>
         <Typography h2>heading 2</Typography>
@@ -17,7 +18,14 @@ export default async function Home() {
         <Typography>span</Typography>
         <Typography className="text-sm">span</Typography>
       </div>
-      <div className="container mx-auto px-6 flex gap-4 flex-wrap">
+      <CustomImage
+        className="my-8"
+        src="/tree.jpg"
+        alt="placeholder"
+        width={1512}
+        height={1008}
+      />
+      <div className="my-8 flex gap-4 flex-wrap">
         <Button loading={false} variant={ButtonVariant.PRIMARY}>
           Primary
         </Button>
@@ -55,7 +63,7 @@ export default async function Home() {
           Loading
         </Button>
       </div>
-      <div className="container mx-auto px-6 flex py-8">
+      <div className="flex my-8 gap-4">
         <Link legacyBehavior href="/">
           Link
         </Link>
