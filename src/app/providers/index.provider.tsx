@@ -1,19 +1,17 @@
-"use client";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { SessionProvider } from "./Session.provider";
+import { PrefetchData } from "./PrefetchData.provider";
+import QueryProvider from "./Query.provider";
+import { Redirect } from "./Redirect.provider";
 
-const queryClient = new QueryClient();
-
-export default function Provider({
-  sessionData,
+export default async function Provider({
   children,
 }: Readonly<{
-  sessionData: any;
   children: React.ReactNode;
 }>) {
   return (
-    <SessionProvider value={sessionData}>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </SessionProvider>
+    <QueryProvider>
+      <PrefetchData>
+        <Redirect>{children}</Redirect>
+      </PrefetchData>
+    </QueryProvider>
   );
 }
