@@ -6,7 +6,7 @@ import { getDrawingById } from "@/app/helpers/queries/index.client";
 import { socket } from "@/socket";
 import { useQuery } from "@tanstack/react-query";
 import { debounce } from "lodash";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { saveDrawings } from "../../../../actions/drawing";
 import Button from "../Button";
@@ -14,6 +14,7 @@ import { ButtonVariant } from "../Button/index.types";
 import Typography from "../Typography";
 import { DrawLineProps } from "./index.types";
 const CanvasBoard = ({ id }) => {
+  const [IsloadingClear, setIsloadingClear] = useState(false);
   const { data, isLoading } = useQuery({
     queryKey: ["getDrawingById", id],
     queryFn: () => getDrawingById(id),
@@ -67,9 +68,11 @@ const CanvasBoard = ({ id }) => {
   }
 
   function clearBoard() {
+    setIsloadingClear(true);
     socket.emit("clear", data?.data?.id);
     clear();
     debounceOnChange();
+    setIsloadingClear(false);
   }
 
   async function save() {
@@ -85,7 +88,11 @@ const CanvasBoard = ({ id }) => {
   return (
     <div>
       <div className="flex justify-between align-center my-8 gap-4">
-        <Button variant={ButtonVariant.DANGER} onClick={clearBoard}>
+        <Button
+          variant={ButtonVariant.DANGER}
+          loading={IsloadingClear || isLoading}
+          onClick={clearBoard}
+        >
           Clear
         </Button>
         {isLoading ? (
