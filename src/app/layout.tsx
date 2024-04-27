@@ -6,6 +6,7 @@ import Container from "./components/Container";
 import "./globals.css";
 import Header from "./modules/Header";
 import Provider from "./providers/index.provider";
+import { Redirect } from "./providers/Redirect.provider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -25,8 +26,10 @@ export default async function RootLayout({
       >
         <Provider>
           <Container>
-            <Header />
-            {children}
+            <Redirect>
+              <Header />
+              {children}
+            </Redirect>
           </Container>
           <ToastContainer />
         </Provider>

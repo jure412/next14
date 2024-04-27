@@ -6,12 +6,12 @@ import { getMe } from "../helpers/queries/index.client";
 export const Redirect = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const router = useRouter();
-  const { data, isLoading } = useQuery({
+  const { data, isError, isLoading, isFetched } = useQuery({
     queryKey: ["getMe"],
     queryFn: () => getMe(),
   });
-  const protectedRoutes = ["/drawings"];
-  if (!data?.isAuth && protectedRoutes.includes(pathname)) {
+  const protectedRoutes = "/drawings";
+  if (isFetched && !data?.isAuth && pathname.includes(protectedRoutes)) {
     router.push("/");
   }
   return <>{children}</>;
