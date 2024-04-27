@@ -24,6 +24,7 @@ export default async function Home() {
         alt="placeholder"
         width={1512}
         height={1008}
+        priority={true}
       />
       <div className="my-8 flex gap-4 flex-wrap">
         <Button loading={false} variant={ButtonVariant.PRIMARY}>
