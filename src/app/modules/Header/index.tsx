@@ -5,11 +5,12 @@ import { LinkVariant } from "@/app/components/Link/index.types";
 import Modal from "@/app/components/Modal";
 import NextLink from "@/app/components/NextLink";
 import { getMe } from "@/app/helpers/queries/index.client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { AiOutlineLogin } from "react-icons/ai";
 import { CiAirportSign1 } from "react-icons/ci";
 import { FaSpinner } from "react-icons/fa";
+import { toast } from "react-toastify";
 import { signOut } from "../../../../actions/auth";
 import Authentication from "../ModalContent/Authentication";
 
@@ -20,10 +21,32 @@ const Header: React.FC = () => {
     queryFn: () => getMe(),
   });
 
-  const handleSingOut = async () => {
-    await signOut();
-    queryClient.invalidateQueries({ queryKey: ["getMe"] });
-  };
+  const { mutate, isPending } = useMutation({
+    mutationFn: signOut,
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ["getMe"] });
+      queryClient.setQueryData(["getMe"], {
+        isAuth: false,
+        msg: ["Unauthorized"],
+        success: false,
+      });
+
+      return data;
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSuccess: (data) => {
+      if (!data?.success) {
+        toast.error(data?.msg?.[0]);
+      } else {
+        toast.success(data?.msg?.[0]);
+      }
+    },
+    onSettled() {
+      queryClient.invalidateQueries({ queryKey: ["getMe"] });
+    },
+  });
 
   return (
     <header>
@@ -49,15 +72,17 @@ const Header: React.FC = () => {
               >
                 Drawings
               </NextLink>
-              <form action={handleSingOut}>
-                <Button
-                  size={ButtonSize.SMALL}
-                  variant={ButtonVariant.TERTIARY}
-                  type="submit"
-                >
-                  Sign out
-                </Button>
-              </form>
+              {/* <form action={mutate}> */}
+              <Button
+                onClick={() => mutate()}
+                size={ButtonSize.SMALL}
+                variant={ButtonVariant.TERTIARY}
+                loading={isPending}
+                // type="submit"
+              >
+                Sign out
+              </Button>
+              {/* </form> */}
             </>
           ) : (
             <Modal
