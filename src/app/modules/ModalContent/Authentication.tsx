@@ -4,7 +4,7 @@ import { ButtonVariant } from "@/app/components/Button/index.types";
 import Input from "@/app/components/Input";
 import Link from "@/app/components/Link";
 import Typography from "@/app/components/Typography";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { AiOutlineLogin } from "react-icons/ai";
@@ -47,24 +47,29 @@ const Authentication: React.FC<AuthenticationProps> = ({
   });
 
   const onSubmit = async (values: Values) => {
-    setLoading(true);
-    const response: any =
-      step === 1
-        ? await signIn(values)
-        : step === 2
-        ? await signUp(values)
-        : await resendVerificationEmail(values.email);
-    if (response.success) {
-      toast.success(response?.msg?.[0]);
-      setIsOpen?.(false);
-      queryClient.invalidateQueries({ queryKey: ["getMe"] });
-    } else {
-      response.msg?.forEach((msg: string) => {
-        toast.error(msg);
-      });
-    }
-    setLoading(false);
+    mutate(step === 1 ? values : step === 2 ? values : values.email);
   };
+
+  const mutationFn =
+    step === 1 ? signIn : step === 2 ? signUp : resendVerificationEmail;
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: (values: any) => mutationFn(values),
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSuccess: async (values) => {
+      if (!values?.success) {
+        toast.error(values?.msg?.[0]);
+      } else {
+        toast.success(values?.msg?.[0]);
+        setIsOpen?.(false);
+      }
+    },
+    onSettled() {
+      step === 1 && queryClient.invalidateQueries({ queryKey: ["getMe"] });
+    },
+  });
 
   const handleGoogleSubmit = async () => {
     setLoading(true);
@@ -110,27 +115,27 @@ const Authentication: React.FC<AuthenticationProps> = ({
         variant={ButtonVariant.DANGER}
         className="w-full"
         onClick={handleGoogleSubmit}
-        loading={loading}
+        loading={isPending}
       >
         Sign in with Google
       </Button>
       {step === 1 ? (
         <SignIn
           methods={methods}
-          loading={loading}
+          loading={isPending}
           onSubmit={onSubmit}
           setStep={setStep}
         />
       ) : step === 2 ? (
         <SignUp
           methods={methods}
-          loading={loading}
+          loading={isPending}
           onSubmit={onSubmit}
           setStep={setStep}
         />
       ) : (
         <ResendVerification
-          loading={loading}
+          loading={isPending}
           methods={methods}
           onSubmit={onSubmit}
           setStep={setStep}
