@@ -6,7 +6,7 @@ import { getMe } from "../helpers/queries/index.client";
 export const Redirect = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const router = useRouter();
-  const { data, isError, isLoading, isFetched } = useQuery({
+  const { data, isFetched } = useQuery({
     queryKey: ["getMe"],
     queryFn: () => getMe(),
   });

@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../../prisma/prismaClient";
 interface GetProps {
@@ -12,6 +12,17 @@ export const GET = async (
   { params: { id } }: NextResponse & GetProps
 ) => {
   try {
+    const sessionId: any = cookies().get("auth_session")?.value;
+    if (!sessionId) {
+      throw new Error("No sessionId found");
+    }
+    const sessionUser = await prisma.session.findUnique({
+      where: { id: sessionId },
+    });
+    if (!sessionUser) {
+      throw new Error("No user found");
+    }
+
     if (!id) {
       throw new Error("No id provided");
     }
@@ -25,7 +36,7 @@ export const GET = async (
     });
 
     if (!userDrawings) {
-      throw new Error("No drawings found for this user");
+      throw new Error("Drawing not found for this user");
     }
 
     return NextResponse.json({
@@ -34,13 +45,9 @@ export const GET = async (
       data: userDrawings,
     });
   } catch (error) {
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return NextResponse.json({ msg: ["Prisma Error"], success: false });
-    } else {
-      return NextResponse.json({
-        msg: [error.message],
-        success: false,
-      });
-    }
+    return NextResponse.json({
+      msg: [error.message],
+      success: false,
+    });
   }
 };

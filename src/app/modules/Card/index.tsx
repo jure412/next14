@@ -20,7 +20,11 @@ const Card: React.FC<CardProps> = ({ item }) => {
       <div>
         <div className="h-[220px] rounded-xl relative overflow-hidden">
           <CustomImage
-            src={item.url ? "/" + item.url : "/tree.jpg"}
+            src={
+              item.url
+                ? "/api/assets/" + item.url.replace("canvas/", "")
+                : "/tree.jpg"
+            }
             alt={item.name}
             priority={true}
             className="object-cover"

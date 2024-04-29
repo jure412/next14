@@ -5,6 +5,10 @@ import { headers } from "next/headers";
 
 const Page = async ({ params }: { params: { id: string } }) => {
   const queryClient = getQueryClient();
+
+  queryClient.setDefaultOptions({
+    queries: { staleTime: 0, gcTime: 0 },
+  });
   await queryClient.prefetchQuery({
     queryKey: ["getDrawingById", params.id],
     queryFn: () =>

@@ -22,3 +22,9 @@ export interface ApiResponse {
   success: boolean;
   data?: Data;
 }
+
+export interface GetProps {
+  params: {
+    id: string;
+  };
+}

@@ -6,56 +6,35 @@ import { getDrawingById } from "@/app/helpers/queries/index.client";
 import { socket } from "@/socket";
 import { useQuery } from "@tanstack/react-query";
 import { debounce } from "lodash";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaSpinner } from "react-icons/fa";
+import { toast } from "react-toastify";
 import { saveDrawings } from "../../../../actions/drawing";
 import Button from "../Button";
 import { ButtonVariant } from "../Button/index.types";
 import Typography from "../Typography";
 import { DrawLineProps } from "./index.types";
-const CanvasBoard = ({ id }) => {
+
+const CanvasBoard = ({ id }: { id: string }) => {
+  const { push } = useRouter();
   const [IsloadingClear, setIsloadingClear] = useState(false);
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isFetched } = useQuery({
     queryKey: ["getDrawingById", id],
     queryFn: () => getDrawingById(id),
   });
   const { canvasRef, onMouseDown, clear } = useDraw(createLine);
   const color = "#000";
 
-  useEffect(() => {
-    if (!data) return;
-    function canvasState(state: string) {
-      const ctx = canvasRef.current?.getContext("2d");
-      const img = new Image();
-      img.src = state;
-      img.onload = () => {
-        ctx?.drawImage(img, 0, 0);
-      };
+  async function save() {
+    if (canvasRef.current) {
+      const dataUrl = canvasRef.current.toDataURL();
+      const formData = new FormData();
+      formData.append("drawingId", data?.data?.id);
+      formData.append("canvas", dataUrl);
+      await saveDrawings(formData);
     }
-    const ctx = canvasRef.current?.getContext("2d");
-    canvasState(process.env.NEXTAUTH_URL_INTERNAL + "/" + data?.data?.url);
-
-    socket.emit("join-room", data?.data?.id);
-
-    socket.on("user-joined", () => {
-      save();
-    });
-
-    socket.on(
-      "drawing-line",
-      ({ prevPoint, currentPoint, color }: DrawLineProps) => {
-        if (!ctx) return console.log("no ctx here");
-        drawLine({ prevPoint, currentPoint, ctx, color });
-      }
-    );
-
-    socket.on("clear", clear);
-
-    return () => {
-      socket.off("drawing-line");
-      socket.off("clear");
-    };
-  }, [canvasRef, data]);
+  }
 
   const debounceOnChange = debounce(() => {
     save();
@@ -75,15 +54,52 @@ const CanvasBoard = ({ id }) => {
     setIsloadingClear(false);
   }
 
-  async function save() {
-    if (canvasRef.current) {
-      const dataUrl = canvasRef.current.toDataURL();
-      const formData = new FormData();
-      formData.append("drawingId", data?.data?.id);
-      formData.append("canvas", dataUrl);
-      await saveDrawings(formData);
+  useEffect(() => {
+    if (isFetched && !data?.success) {
+      toast.error(data?.msg[0]);
+      push("/drawings");
     }
-  }
+  }, [isFetched, data, push]);
+
+  useEffect(() => {
+    function canvasState() {
+      const state =
+        process.env.NEXTAUTH_URL_INTERNAL +
+        "/api/assets/" +
+        data?.data?.url.replace("canvas/", "");
+      const ctx = canvasRef.current?.getContext("2d");
+      const img = new Image();
+      img.src = state;
+      img.onload = () => {
+        ctx?.drawImage(img, 0, 0);
+      };
+    }
+    if (data?.success) {
+      const ctx = canvasRef.current?.getContext("2d");
+      data?.data?.url && canvasState();
+
+      socket.emit("join-room", data?.data?.id);
+
+      socket.on("user-joined", () => {
+        save();
+      });
+
+      socket.on(
+        "drawing-line",
+        ({ prevPoint, currentPoint, color }: DrawLineProps) => {
+          if (!ctx) return console.log("no ctx here");
+          drawLine({ prevPoint, currentPoint, ctx, color });
+        }
+      );
+
+      socket.on("clear", clear);
+
+      return () => {
+        socket.off("drawing-line");
+        socket.off("clear");
+      };
+    }
+  }, [canvasRef, data, clear]);
 
   return (
     <div>

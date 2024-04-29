@@ -10,7 +10,7 @@ export const saveBase64ImageToFile = (
 
     if (matches && matches.length === 3) {
       const imageData = matches[2];
-      const imagePath = path.join("public", "uploads", `${id}.png`); // Always save as SVG
+      const imagePath = path.join("assets", "canvas", `${id}.png`);
       const directoryPath = path.dirname(imagePath);
 
       // Create the directory if it doesn't exist
@@ -20,7 +20,7 @@ export const saveBase64ImageToFile = (
         if (error) {
           reject(error);
         } else {
-          resolve(imagePath.replace("public/", ""));
+          resolve(imagePath.replace("assets/", ""));
         }
       });
     } else {
@@ -28,3 +28,22 @@ export const saveBase64ImageToFile = (
     }
   });
 };
+
+export function iteratorToStream(iterator) {
+  return new ReadableStream({
+    async pull(controller) {
+      const { value, done } = await iterator.next();
+      if (done) {
+        controller.close();
+      } else {
+        controller.enqueue(value);
+      }
+    },
+  });
+}
+
+export async function* nodeStreamToIterator(stream: fs.ReadStream) {
+  for await (const chunk of stream) {
+    yield new Uint8Array(chunk);
+  }
+}

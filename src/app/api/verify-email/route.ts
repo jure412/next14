@@ -12,7 +12,7 @@ export const GET = async (req: NextRequest) => {
     const token = searchParams.get("token");
 
     if (!token) {
-      return Response.json({ msg: ["Missing token."], success: false });
+      throw new Error("Missing token.");
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
@@ -30,7 +30,7 @@ export const GET = async (req: NextRequest) => {
       });
 
     if (!emailVerificationQueryResult) {
-      return Response.json({ msg: ["Invalid token."], success: false });
+      throw new Error("Invalid token.");
     }
     await prisma.emailVerification.delete({
       where: {
