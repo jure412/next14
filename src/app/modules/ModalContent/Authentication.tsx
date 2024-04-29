@@ -14,7 +14,7 @@ import {
   resendVerificationEmail,
   signIn,
   signUp,
-} from "../../../../actions/auth";
+} from "../../actions/auth";
 import { AuthenticationProps, FormProps, Values } from "./index.types";
 
 const singUpValues: Values = {
@@ -25,8 +25,8 @@ const singUpValues: Values = {
 };
 
 const singInValues: Values = {
-  password: "12345678",
-  email: "jur3curk+1@gmail.com",
+  password: "",
+  email: "",
 };
 
 const ResendValues: Values = {
