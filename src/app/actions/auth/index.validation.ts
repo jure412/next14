@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { prisma } from "../../prisma/prismaClient";
+import { prisma } from "../../../../prisma/prismaClient";
 
 export const SignUpSchema = z
   .object({

@@ -11,7 +11,7 @@ import { AiOutlineLogin } from "react-icons/ai";
 import { CiAirportSign1 } from "react-icons/ci";
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { signOut } from "../../../../actions/auth";
+import { signOut } from "../../actions/auth";
 import Authentication from "../ModalContent/Authentication";
 
 const Header: React.FC = () => {

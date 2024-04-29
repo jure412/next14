@@ -11,7 +11,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { AiOutlineClose } from "react-icons/ai";
 import { MdDraw } from "react-icons/md";
 import { toast } from "react-toastify";
-import { newDrawing } from "../../../../actions/drawing";
+import { newDrawing } from "../../actions/drawing";
 import { AuthenticationProps, NewDrawingsValuesProps } from "./index.types";
 
 const defaultValues: NewDrawingsValuesProps = {

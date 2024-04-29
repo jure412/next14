@@ -7,10 +7,10 @@ import { socket } from "@/socket";
 import { useQuery } from "@tanstack/react-query";
 import { debounce } from "lodash";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
-import { saveDrawings } from "../../../../actions/drawing";
+import { saveDrawings } from "../../actions/drawing";
 import Button from "../Button";
 import { ButtonVariant } from "../Button/index.types";
 import Typography from "../Typography";
@@ -18,7 +18,6 @@ import { DrawLineProps } from "./index.types";
 
 const CanvasBoard = ({ id }: { id: string }) => {
   const { push } = useRouter();
-  const [IsloadingClear, setIsloadingClear] = useState(false);
   const { data, isLoading, isFetched } = useQuery({
     queryKey: ["getDrawingById", id],
     queryFn: () => getDrawingById(id),
@@ -46,12 +45,10 @@ const CanvasBoard = ({ id }: { id: string }) => {
     debounceOnChange();
   }
 
-  function clearBoard() {
-    setIsloadingClear(true);
+  async function clearBoard() {
     socket.emit("clear", data?.data?.id);
-    clear();
     debounceOnChange();
-    setIsloadingClear(false);
+    clear();
   }
 
   useEffect(() => {
@@ -66,7 +63,9 @@ const CanvasBoard = ({ id }: { id: string }) => {
       const state =
         process.env.NEXTAUTH_URL_INTERNAL +
         "/api/assets/" +
-        data?.data?.url.replace("canvas/", "");
+        data?.data?.url.replace("canvas/", "") +
+        "?=" +
+        new Date().getTime();
       const ctx = canvasRef.current?.getContext("2d");
       const img = new Image();
       img.src = state;
@@ -106,7 +105,7 @@ const CanvasBoard = ({ id }: { id: string }) => {
       <div className="flex justify-between align-center my-8 gap-4">
         <Button
           variant={ButtonVariant.DANGER}
-          loading={IsloadingClear || isLoading}
+          loading={isLoading}
           onClick={clearBoard}
         >
           Clear

@@ -33,7 +33,6 @@ export async function GET(req: NextRequest, res: NextResponse & GetProps) {
       nodeStreamToIterator(nodeStream)
     );
     const mimetype = mime.getType(filepath);
-
     return new Response(stream, {
       status: 200,
       headers: new Headers({
@@ -42,6 +41,7 @@ export async function GET(req: NextRequest, res: NextResponse & GetProps) {
         )}`,
         "content-type": mimetype || "application/octet-stream",
         "content-length": stats.size + "",
+        // "cache-control": "public, max-age=31536000, immutable",
       }),
     });
   } catch (error) {

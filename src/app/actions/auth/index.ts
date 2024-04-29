@@ -5,10 +5,10 @@ import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { generateId } from "lucia";
 import { cookies } from "next/headers";
-import { prisma } from "../../prisma/prismaClient";
-import { lucia } from "../../utils/auth";
-import { sendEmail } from "../../utils/email";
-import { google } from "../../utils/oauth";
+import { prisma } from "../../../../prisma/prismaClient";
+import { lucia } from "../../../../utils/auth";
+import { sendEmail } from "../../../../utils/email";
+import { google } from "../../../../utils/oauth";
 import {
   EmailVerificationSchema,
   SignInSchema,
