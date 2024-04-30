@@ -1,10 +1,11 @@
 const next = require("next");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
+require("dotenv").config();
 
 const dev = process.env.NODE_ENV !== "production";
-const hostname = process.env.HOSTNAME;
-const port = process.env.PORT;
+const hostname = process.env.NEXT_PUBLIC_HOSTNAME;
+const port = process.env.NEXT_PUBLIC_PORT;
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
 
