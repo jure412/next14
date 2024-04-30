@@ -3,8 +3,8 @@ const { createServer } = require("http");
 const { Server } = require("socket.io");
 
 const dev = process.env.NODE_ENV !== "production";
-const hostname = "localhost";
-const port = 3000;
+const hostname = process.env.HOSTNAME;
+const port = process.env.PORT;
 const app = next({ dev, hostname, port });
 const handler = app.getRequestHandler();
 

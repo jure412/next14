@@ -8,7 +8,7 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ["http://localhost:3000"],
+    domains: [process.env.NEXTAUTH_URL_INTERNAL],
     unoptimized: true,
   },
   env: {
