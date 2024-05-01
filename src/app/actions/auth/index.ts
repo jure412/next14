@@ -83,7 +83,7 @@ export const resendVerificationEmail = async (email: string) => {
       }
     );
 
-    const url = `${process.env.NEXTAUTH_URL_INTERNAL}/api/verify-email?token=${token}`;
+    const url = `${process.env.NEXTAUTH_URL}/verify-email?token=${token}`;
     await sendEmail({
       html: `<a href="${url}">Verify your email</a>`,
       subject: "Verify your email",
@@ -138,7 +138,7 @@ export const signUp = async (values: Values) => {
       }
     );
 
-    const url = `${process.env.NEXTAUTH_URL_INTERNAL}/api/verify-email?token=${token}`;
+    const url = `${process.env.NEXTAUTH_URL}/verify-email?token=${token}`;
 
     await sendEmail({
       html: `<a href="${url}">Verify your email</a>`,
@@ -277,5 +277,72 @@ export const createGoogleAuthorizationURL = async () => {
     };
   } catch (error) {
     return { msg: [error?.message], success: false };
+  }
+};
+
+export const verifyEmail = async (token: string) => {
+  try {
+    //  const url = new URL(req.url);
+    //  const searchParams = url.searchParams;
+    //  const token = searchParams.get("token");
+    console.log({ token });
+
+    if (!token) {
+      throw new Error("Missing token.");
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+      email: string;
+      code: string;
+      userId: string;
+    };
+
+    const emailVerificationQueryResult =
+      await prisma.emailVerification.findFirst({
+        where: {
+          userId: decoded.userId,
+          code: decoded.code,
+        },
+      });
+
+    if (!emailVerificationQueryResult) {
+      throw new Error("Invalid token.");
+    }
+    await prisma.emailVerification.delete({
+      where: {
+        id: emailVerificationQueryResult.id,
+      },
+    });
+
+    await prisma.user.update({
+      where: {
+        email: decoded.email,
+      },
+      data: {
+        emailVerified: true,
+      },
+    });
+
+    const userId = decoded?.userId;
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + 3);
+    const session = await lucia.createSession(userId, {
+      expiresAt: currentDate,
+    });
+    console.log("session1");
+    const sessionCookie = lucia.createSessionCookie(session.id);
+    console.log("session2");
+
+    cookies().set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes
+    );
+    console.log("session3");
+
+    // return Response.redirect(new URL(process.env.NEXTAUTH_URL!), 302);
+    return { msg: ["User is verified"], success: true };
+  } catch (error) {
+    return { msg: [error.message], success: false };
   }
 };

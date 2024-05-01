@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
     !cookieExists &&
     (pathname.startsWith("/drawings") || pathname.startsWith("/api/assets/"))
   ) {
-    return NextResponse.redirect(process.env.NEXTAUTH_URL_INTERNAL + "/");
+    return NextResponse.redirect(process.env.NEXTAUTH_URL + "/");
   }
   return response;
 }

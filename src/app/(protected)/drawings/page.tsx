@@ -13,7 +13,7 @@ const Page = async () => {
   await queryClient.prefetchQuery({
     queryKey: ["getDrawings"],
     queryFn: () =>
-      getDrawings(process.env.NEXTAUTH_URL_INTERNAL + "/api/drawings", {
+      getDrawings(process.env.NEXTAUTH_URL + "/api/drawings", {
         headers: headers(),
       }),
   });

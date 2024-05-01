@@ -15,13 +15,12 @@ interface GoogleUser {
 }
 
 export const GET = async (req: NextRequest) => {
+  console.log(req.url);
+  const url = new URL(req.url);
+  const searchParams = url.searchParams;
+  const code = searchParams.get("code");
+  const state = searchParams.get("state");
   try {
-    const url = new URL(req.url);
-    const searchParams = url.searchParams;
-
-    const code = searchParams.get("code");
-    const state = searchParams.get("state");
-
     if (!code || !state) {
       throw new Error("Invalid request");
     }
@@ -142,12 +141,13 @@ export const GET = async (req: NextRequest) => {
       expires: new Date(0),
     });
 
-    return NextResponse.redirect(
-      new URL("/", process.env.NEXTAUTH_URL_INTERNAL),
-      {
-        status: 302,
-      }
-    );
+    // return Response.json({
+    //   msg: ["hey"],
+    //   success: false,
+    // });
+    return NextResponse.redirect(new URL("/", process.env.NEXTAUTH_URL), {
+      status: 302,
+    });
   } catch (error) {
     return Response.json({
       msg: [error.message],

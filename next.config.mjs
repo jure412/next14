@@ -8,11 +8,12 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: [process.env.NEXTAUTH_URL_INTERNAL],
+    domains: [process.env.NEXTAUTH_URL],
     unoptimized: true,
   },
   env: {
-    NEXTAUTH_URL_INTERNAL: process.env.NEXTAUTH_URL_INTERNAL,
+    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    // NEXTAUTH_URL: process.env.NEXTAUTH_URL,
   },
 };
 

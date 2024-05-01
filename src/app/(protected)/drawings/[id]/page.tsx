@@ -8,11 +8,9 @@ const Page = async ({ params }: { params: { id: string } }) => {
   await queryClient.prefetchQuery({
     queryKey: ["getDrawingById", params.id],
     queryFn: () =>
-      getDrawingById(
-        params.id,
-        process.env.NEXTAUTH_URL_INTERNAL + "/api/drawings/",
-        { headers: headers() }
-      ),
+      getDrawingById(params.id, process.env.NEXTAUTH_URL + "/api/drawings/", {
+        headers: headers(),
+      }),
   });
 
   return <CanvasBoard id={params.id} />;

@@ -3,5 +3,5 @@ import { Google } from "arctic";
 export const google = new Google(
   process.env.GOOGLE_CLIENT_ID!,
   process.env.GOOGLE_CLIENT_SECRET!,
-  process.env.NEXTAUTH_URL_INTERNAL + "/api/oauth/google"
+  process.env.NEXTAUTH_URL + "/api/oauth/google"
 );

@@ -62,7 +62,7 @@ export const GET = async (req: NextRequest) => {
       sessionCookie.attributes
     );
 
-    return Response.redirect(new URL(process.env.NEXTAUTH_URL_INTERNAL!), 302);
+    return Response.redirect(new URL(process.env.NEXTAUTH_URL!), 302);
   } catch (error) {
     return Response.json({ msg: [error.message], success: false });
   }

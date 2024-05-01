@@ -61,7 +61,7 @@ const CanvasBoard = ({ id }: { id: string }) => {
   useEffect(() => {
     function canvasState() {
       const state =
-        process.env.NEXTAUTH_URL_INTERNAL +
+        process.env.NEXTAUTH_URL +
         "/api/assets/" +
         data?.data?.url.replace("canvas/", "") +
         "?=" +

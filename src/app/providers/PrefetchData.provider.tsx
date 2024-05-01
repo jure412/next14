@@ -22,7 +22,7 @@ export const PrefetchData = async ({
   await queryClient.prefetchQuery({
     queryKey: ["getMe"],
     queryFn: () =>
-      getMe(process.env.NEXTAUTH_URL_INTERNAL + "/api/user", {
+      getMe(process.env.NEXTAUTH_URL + "/api/user", {
         headers: headers(),
       }),
   });
