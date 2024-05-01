@@ -2,6 +2,7 @@
   "name": "next14",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "node server.js",
     "build": "next build",
@@ -19,6 +20,7 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/lodash": "^4.17.0",
     "@types/nodemailer": "^6.4.14",
+    "@types/socket.io": "^3.0.2",
     "arctic": "^1.5.0",
     "argon2": "^0.40.1",
     "dotenv": "^16.4.5",
