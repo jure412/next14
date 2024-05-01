@@ -1,7 +1,8 @@
-const next = require("next");
-const { createServer } = require("http");
-const { Server } = require("socket.io");
-require("dotenv").config();
+import dotenv from "dotenv";
+import { createServer } from "http";
+import next from "next";
+import { Server } from "socket.io";
+dotenv.config();
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = process.env.NEXT_PUBLIC_HOSTNAME;
