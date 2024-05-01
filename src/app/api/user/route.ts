@@ -4,8 +4,7 @@ import { lucia } from "../../../../utils/auth";
 
 export const GET = async () => {
   try {
-    let sessionId: string =
-      cookies().get(lucia.sessionCookieName)?.value ?? null;
+    let sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
     if (!sessionId) {
       throw new Error("Unauthorized");
     }
@@ -36,7 +35,7 @@ export const GET = async () => {
       isAuth: true,
       data: { user, session },
     });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({
       msg: [error.message],
       success: false,

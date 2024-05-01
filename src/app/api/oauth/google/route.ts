@@ -148,7 +148,7 @@ export const GET = async (req: NextRequest) => {
     return NextResponse.redirect(new URL("/", process.env.NEXTAUTH_URL), {
       status: 302,
     });
-  } catch (error) {
+  } catch (error: any) {
     return Response.json({
       msg: [error.message],
       success: false,

@@ -14,7 +14,7 @@ import { saveDrawings } from "../../actions/drawing";
 import Button from "../Button";
 import { ButtonVariant } from "../Button/index.types";
 import Typography from "../Typography";
-import { DrawLineProps } from "./index.types";
+import { Draw, DrawLineProps } from "./index.types";
 
 const CanvasBoard = ({ id }: { id: string }) => {
   const { push } = useRouter();
@@ -39,9 +39,9 @@ const CanvasBoard = ({ id }: { id: string }) => {
     save();
   }, 500);
 
-  function createLine(_drawing: DrawLineProps) {
+  function createLine(_drawing: Draw) {
     socket.emit("drawing-line", data?.data?.id, _drawing);
-    drawLine({ color, ..._drawing });
+    drawLine({ ..._drawing, color });
     debounceOnChange();
   }
 

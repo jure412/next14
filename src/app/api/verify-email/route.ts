@@ -63,7 +63,7 @@ export const GET = async (req: NextRequest) => {
     );
 
     return Response.redirect(new URL(process.env.NEXTAUTH_URL!), 302);
-  } catch (error) {
+  } catch (error: any) {
     return Response.json({ msg: [error.message], success: false });
   }
 };

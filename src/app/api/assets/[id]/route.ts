@@ -44,7 +44,7 @@ export async function GET(req: NextRequest, res: NextResponse & GetProps) {
         // "cache-control": "public, max-age=31536000, immutable",
       }),
     });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({
       msg: [error.message],
       success: false,

@@ -29,7 +29,7 @@ export const saveBase64ImageToFile = (
   });
 };
 
-export function iteratorToStream(iterator) {
+export function iteratorToStream(iterator: any) {
   return new ReadableStream({
     async pull(controller) {
       const { value, done } = await iterator.next();

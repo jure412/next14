@@ -94,14 +94,14 @@ export const resendVerificationEmail = async (email: string) => {
       msg: ["Email resent"],
       success: true,
     };
-  } catch (error) {
-    return { msg: [error.message], success: false };
+  } catch (error: any) {
+    return { msg: [error?.message], success: false };
   }
 };
 
 export const signUp = async (values: Values) => {
   try {
-    const hashedPassword = await argon2.hash(values.password);
+    const hashedPassword = await argon2.hash(values?.password as string);
     const validationRes: any = await SignUpSchema.safeParseAsync({
       ...values,
     });
@@ -117,7 +117,7 @@ export const signUp = async (values: Values) => {
     const code = Math.random().toString(36).substring(2, 8);
     const user = await prisma.user.create({
       data: {
-        username: values.username,
+        username: values?.username as string,
         email: values.email,
         hashedPassword,
         emailVerification: {
@@ -150,8 +150,8 @@ export const signUp = async (values: Values) => {
       success: true,
       msg: ["Email has been sent to you. Please verify your email."],
     };
-  } catch (error) {
-    return { msg: [error.message], success: false };
+  } catch (error: any) {
+    return { msg: [error?.message], success: false };
   }
 };
 
@@ -213,15 +213,14 @@ export const signIn = async (values: any) => {
         sessionId: sessionCookie.value,
       },
     };
-  } catch (error) {
+  } catch (error: any) {
     return { msg: [error.message], success: false };
   }
 };
 
 export const signOut = async () => {
   try {
-    let sessionId: string =
-      cookies().get(lucia.sessionCookieName)?.value ?? null;
+    let sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
 
     if (!sessionId) {
       throw new Error("Unauthorized");
@@ -241,7 +240,7 @@ export const signOut = async () => {
       success: true,
       msg: ["User logged out successfully."],
     };
-  } catch (error) {
+  } catch (error: any) {
     return { msg: [error?.message], success: false };
   }
 };
@@ -275,18 +274,13 @@ export const createGoogleAuthorizationURL = async () => {
       msg: ["Authorization URL created successfully."],
       data: authorizationURL.href,
     };
-  } catch (error) {
+  } catch (error: any) {
     return { msg: [error?.message], success: false };
   }
 };
 
 export const verifyEmail = async (token: string) => {
   try {
-    //  const url = new URL(req.url);
-    //  const searchParams = url.searchParams;
-    //  const token = searchParams.get("token");
-    console.log({ token });
-
     if (!token) {
       throw new Error("Missing token.");
     }
@@ -329,20 +323,16 @@ export const verifyEmail = async (token: string) => {
     const session = await lucia.createSession(userId, {
       expiresAt: currentDate,
     });
-    console.log("session1");
     const sessionCookie = lucia.createSessionCookie(session.id);
-    console.log("session2");
 
     cookies().set(
       sessionCookie.name,
       sessionCookie.value,
       sessionCookie.attributes
     );
-    console.log("session3");
 
-    // return Response.redirect(new URL(process.env.NEXTAUTH_URL!), 302);
     return { msg: ["User is verified"], success: true };
-  } catch (error) {
-    return { msg: [error.message], success: false };
+  } catch (error: any) {
+    return { msg: [error?.message], success: false };
   }
 };

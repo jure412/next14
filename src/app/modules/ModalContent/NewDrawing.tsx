@@ -4,7 +4,6 @@ import { ButtonVariant } from "@/app/components/Button/index.types";
 import Input from "@/app/components/Input";
 import Typography from "@/app/components/Typography";
 import { getUserById } from "@/app/helpers/queries/index.client";
-import { Drawing } from "@prisma/client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -45,9 +44,7 @@ const NewDrawing: React.FC<AuthenticationProps> = ({
     mutationFn: newDrawing,
     onMutate: async (values: NewDrawingsValuesProps) => {
       await queryClient.cancelQueries({ queryKey: ["getDrawings"] });
-      const prevDrawings: { data: Drawing[] } = queryClient.getQueryData([
-        "getDrawings",
-      ]);
+      const prevDrawings: any = queryClient.getQueryData(["getDrawings"]);
       const updatedDrawings = {
         ...prevDrawings,
         data: [...prevDrawings.data, { drawing: { name: values.name } }],
@@ -74,7 +71,7 @@ const NewDrawing: React.FC<AuthenticationProps> = ({
 
   const handleAddUser = async () => {
     const users: string[] = methods.getValues("users");
-    const email: string = methods.getValues("email");
+    const email: string = methods.getValues("email") as string;
     if (email.trim() === "") {
       toast.error("Email is required");
       return;

@@ -31,7 +31,7 @@ export const GET = async () => {
       msg: ["User drawings retrieved successfully"],
       data: userDrawings,
     });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({
       msg: [error.message],
       success: false,

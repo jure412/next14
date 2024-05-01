@@ -1,7 +1,6 @@
 "use server";
 import { saveBase64ImageToFile } from "@/app/helpers/functions/server";
 import { NewDrawingsValuesProps } from "@/app/modules/ModalContent/index.types";
-import { User } from "lucia";
 import { cookies } from "next/headers";
 import { prisma } from "../../../../prisma/prismaClient";
 import { NewDrawingSchema } from "./index.validation";
@@ -47,7 +46,7 @@ export const newDrawing = async ({ name, users }: NewDrawingsValuesProps) => {
       if (foundUsers.length !== users.length) {
         throw new Error("User not found.");
       }
-      usersId = foundUsers.map((user: User) => user.id);
+      usersId = foundUsers.map((user: { id: string }) => user.id);
     }
     usersId = [...usersId, userSession?.userId];
 
@@ -74,7 +73,7 @@ export const newDrawing = async ({ name, users }: NewDrawingsValuesProps) => {
       data: drawing,
       msg: ["Drawing created successfully."],
     };
-  } catch (error) {
+  } catch (error: any) {
     return {
       success: false,
       msg: [error.message],
@@ -106,7 +105,7 @@ export const saveDrawings = async (formData: FormData) => {
       data: drawing,
       msg: ["Drawing updated successfully."],
     };
-  } catch (error) {
+  } catch (error: any) {
     return {
       success: false,
       msg: [error.message],

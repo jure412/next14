@@ -13,8 +13,7 @@ export const GET = async (
   { params: { email } }: NextResponse & GetProps
 ) => {
   try {
-    let sessionId: string =
-      cookies().get(lucia.sessionCookieName)?.value ?? null;
+    let sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
     if (!sessionId) {
       throw new Error("Unauthorized");
     }
@@ -41,7 +40,7 @@ export const GET = async (
       success: true,
       data: user,
     });
-  } catch (error) {
+  } catch (error: any) {
     return NextResponse.json({
       msg: [error.message],
       success: false,
