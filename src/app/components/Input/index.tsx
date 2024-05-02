@@ -10,10 +10,8 @@ const Input: React.FC<InputProps> = ({
   validation,
   placeholder,
 }) => {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
+  const { register, formState } = useFormContext();
+  const { errors } = formState;
   const error = errors[name];
 
   useEffect(() => {

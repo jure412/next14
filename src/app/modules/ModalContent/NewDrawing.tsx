@@ -27,15 +27,14 @@ const NewDrawing: React.FC<AuthenticationProps> = ({
 
   const methods = useForm<NewDrawingsValuesProps>({
     defaultValues,
+    reValidateMode: "onSubmit",
   });
 
   const onSubmit = async (values: NewDrawingsValuesProps) => {
-    setLoading(true);
     mutate({
       name: values.name,
       users: values.users,
     });
-    setLoading(false);
   };
 
   const queryClient = useQueryClient();
@@ -128,7 +127,7 @@ const NewDrawing: React.FC<AuthenticationProps> = ({
           />
           <Button
             variant={ButtonVariant.TERTIARY}
-            loading={loading}
+            loading={isPending || loading}
             className="mt-9"
             type="button"
             onClick={handleAddUser}
