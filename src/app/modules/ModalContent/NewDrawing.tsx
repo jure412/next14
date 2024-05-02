@@ -1,9 +1,4 @@
 "use client";
-import Button from "@/app/components/Button";
-import { ButtonVariant } from "@/app/components/Button/index.types";
-import Input from "@/app/components/Input";
-import Typography from "@/app/components/Typography";
-import { getUserById } from "@/app/helpers/queries/index.client";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -11,6 +6,11 @@ import { AiOutlineClose } from "react-icons/ai";
 import { MdDraw } from "react-icons/md";
 import { toast } from "react-toastify";
 import { newDrawing } from "../../actions/drawing";
+import Button from "../../components/Button";
+import { ButtonVariant } from "../../components/Button/index.types";
+import Input from "../../components/Input";
+import Typography from "../../components/Typography";
+import { getUserById } from "../../helpers/queries/index.client";
 import { AuthenticationProps, NewDrawingsValuesProps } from "./index.types";
 
 const defaultValues: NewDrawingsValuesProps = {

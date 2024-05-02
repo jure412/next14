@@ -1,12 +1,12 @@
-import { LinkVariant } from "@/app/components/Link/index.types";
-import Modal from "@/app/components/Modal";
-import { getDrawings } from "@/app/helpers/queries/index.client";
-import DrawingsList from "@/app/modules/DrawingsList";
-import NewDrawing from "@/app/modules/ModalContent/NewDrawing";
-import { getQueryClient } from "@/app/providers/PrefetchData.provider";
 import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { headers } from "next/headers";
 import { MdDraw } from "react-icons/md";
+import { LinkVariant } from "../../components/Link/index.types";
+import Modal from "../../components/Modal";
+import { getDrawings } from "../../helpers/queries/index.client";
+import DrawingsList from "../../modules/DrawingsList";
+import NewDrawing from "../../modules/ModalContent/NewDrawing";
+import { getQueryClient } from "../../providers/PrefetchData.provider";
 
 const Page = async () => {
   const queryClient = getQueryClient();

@@ -1,7 +1,7 @@
-import Button from "@/app/components/Button";
-import Input from "@/app/components/Input";
-import Link from "@/app/components/Link";
 import { FormProvider } from "react-hook-form";
+import Button from "../../components/Button";
+import Input from "../../components/Input";
+import Link from "../../components/Link";
 import { FormProps } from "../ModalContent/index.types";
 
 const SignIn: React.FC<FormProps> = ({

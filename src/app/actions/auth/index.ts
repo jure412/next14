@@ -1,5 +1,4 @@
 "use server";
-import { Values } from "@/app/modules/ModalContent/index.types";
 import { generateCodeVerifier, generateState } from "arctic";
 import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
@@ -9,6 +8,7 @@ import { prisma } from "../../../../prisma/prismaClient";
 import { lucia } from "../../../../utils/auth";
 import { sendEmail } from "../../../../utils/email";
 import { google } from "../../../../utils/oauth";
+import { Values } from "../../modules/ModalContent/index.types";
 import {
   EmailVerificationSchema,
   SignInSchema,

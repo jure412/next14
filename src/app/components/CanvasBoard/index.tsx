@@ -1,16 +1,16 @@
 "use client";
 
-import { drawLine } from "@/app/helpers/functions/client";
-import { useDraw } from "@/app/helpers/hooks/useDraw";
-import { getDrawingById } from "@/app/helpers/queries/index.client";
-import { socket } from "@/socket";
 import { useQuery } from "@tanstack/react-query";
 import { debounce } from "lodash";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
+import { socket } from "../../../socket";
 import { saveDrawings } from "../../actions/drawing";
+import { drawLine } from "../../helpers/functions/client";
+import { useDraw } from "../../helpers/hooks/useDraw";
+import { getDrawingById } from "../../helpers/queries/index.client";
 import Button from "../Button";
 import { ButtonVariant } from "../Button/index.types";
 import Typography from "../Typography";

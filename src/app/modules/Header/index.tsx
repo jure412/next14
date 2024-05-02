@@ -1,10 +1,4 @@
 "use client";
-import Button from "@/app/components/Button";
-import { ButtonSize, ButtonVariant } from "@/app/components/Button/index.types";
-import { LinkVariant } from "@/app/components/Link/index.types";
-import Modal from "@/app/components/Modal";
-import NextLink from "@/app/components/NextLink";
-import { getMe } from "@/app/helpers/queries/index.client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 import { AiOutlineLogin } from "react-icons/ai";
@@ -12,6 +6,12 @@ import { CiAirportSign1 } from "react-icons/ci";
 import { FaSpinner } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { signOut } from "../../actions/auth";
+import Button from "../../components/Button";
+import { ButtonSize, ButtonVariant } from "../../components/Button/index.types";
+import Modal from "../../components/Modal";
+import NextLink from "../../components/NextLink";
+import { LinkVariant } from "../../components/NextLink/index.types";
+import { getMe } from "../../helpers/queries/index.client";
 import Authentication from "../ModalContent/Authentication";
 
 const Header: React.FC = () => {

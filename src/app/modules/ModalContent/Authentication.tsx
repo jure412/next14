@@ -1,9 +1,5 @@
 "use client";
-import Button from "@/app/components/Button";
-import { ButtonVariant } from "@/app/components/Button/index.types";
-import Input from "@/app/components/Input";
-import Link from "@/app/components/Link";
-import Typography from "@/app/components/Typography";
+
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { FormProvider, useForm } from "react-hook-form";
@@ -15,6 +11,11 @@ import {
   signIn,
   signUp,
 } from "../../actions/auth";
+import Button from "../../components/Button";
+import { ButtonVariant } from "../../components/Button/index.types";
+import Input from "../../components/Input";
+import Link from "../../components/Link";
+import Typography from "../../components/Typography";
 import { AuthenticationProps, FormProps, Values } from "./index.types";
 
 const singUpValues: Values = {

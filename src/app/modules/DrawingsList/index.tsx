@@ -1,9 +1,9 @@
 "use client";
 
-import Typography from "@/app/components/Typography";
-import { getDrawings } from "@/app/helpers/queries/index.client";
 import { useQuery } from "@tanstack/react-query";
 import { FaSpinner } from "react-icons/fa";
+import Typography from "../../components/Typography";
+import { getDrawings } from "../../helpers/queries/index.client";
 import Card from "../Card";
 
 export default function DrawingsList() {

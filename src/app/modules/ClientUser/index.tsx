@@ -1,9 +1,9 @@
 "use client";
 
-import Typography from "@/app/components/Typography";
-import { getMe } from "@/app/helpers/queries/index.client";
 import { useQuery } from "@tanstack/react-query";
 import { FaSpinner } from "react-icons/fa";
+import Typography from "../../components/Typography";
+import { getMe } from "../../helpers/queries/index.client";
 
 export default function ClientUser() {
   const { data, isLoading } = useQuery({

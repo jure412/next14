@@ -1,7 +1,7 @@
-import CanvasBoard from "@/app/components/CanvasBoard";
-import { getDrawingById } from "@/app/helpers/queries/index.client";
-import { getQueryClient } from "@/app/providers/PrefetchData.provider";
 import { headers } from "next/headers";
+import CanvasBoard from "../../../components/CanvasBoard";
+import { getDrawingById } from "../../../helpers/queries/index.client";
+import { getQueryClient } from "../../../providers/PrefetchData.provider";
 
 const Page = async ({ params }: { params: { id: string } }) => {
   const queryClient = getQueryClient();

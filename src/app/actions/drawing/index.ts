@@ -1,8 +1,9 @@
 "use server";
-import { saveBase64ImageToFile } from "@/app/helpers/functions/server";
-import { NewDrawingsValuesProps } from "@/app/modules/ModalContent/index.types";
+
 import { cookies } from "next/headers";
 import { prisma } from "../../../../prisma/prismaClient";
+import { saveBase64ImageToFile } from "../../helpers/functions/server";
+import { NewDrawingsValuesProps } from "../../modules/ModalContent/index.types";
 import { NewDrawingSchema } from "./index.validation";
 
 export const newDrawing = async ({ name, users }: NewDrawingsValuesProps) => {

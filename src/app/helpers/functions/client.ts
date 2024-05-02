@@ -1,4 +1,4 @@
-import { DrawLineProps } from "@/app/(protected)/drawings/types";
+import { DrawLineProps } from "../../(protected)/drawings/types";
 
 export const drawLine = ({
   prevPoint,

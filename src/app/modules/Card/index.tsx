@@ -1,6 +1,6 @@
-import CustomImage from "@/app/components/CustomImage";
-import NextLink from "@/app/components/NextLink";
 import React from "react";
+import CustomImage from "../../components/CustomImage";
+import NextLink from "../../components/NextLink";
 
 interface CardProps {
   item: {
