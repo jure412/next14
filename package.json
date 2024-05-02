@@ -23,6 +23,7 @@
     "@types/socket.io": "^3.0.2",
     "arctic": "^1.5.0",
     "argon2": "^0.40.1",
+    "autoprefixer": "^10.0.1",
     "dotenv": "^16.4.5",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
@@ -41,18 +42,18 @@
     "react-toastify": "^10.0.5",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
+    "tailwindcss": "^3.3.0",
     "webpack-node-externals": "^3.0.0",
     "zod": "^3.22.4",
-    "tailwindcss": "^3.3.0",
-    "autoprefixer": "^10.0.1"
+    "typescript": "^5"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
+    "@types/react": "^18.3.1",
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.1.4",
     "postcss": "^8",
-    "typescript": "^5"
+    "typescript": "^5.4.5"
   }
 }
