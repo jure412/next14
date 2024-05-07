@@ -1,7 +1,10 @@
 import { z } from "zod";
 
 export const NewDrawingSchema = z.object({
-  name: z.string().min(1, "This field has to be filled"),
+  name: z
+    .string()
+    .min(1, "This field has to be filled")
+    .max(16, "Max length is 16"),
   users: z
     .array(z.string())
     .refine(
