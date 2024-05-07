@@ -14,16 +14,16 @@ const Card: React.FC<CardProps> = ({ item }) => {
   return (
     <NextLink
       className="bg-white rounded-lg shadow-primary p-4"
-      href={`/drawings/${item.id}`}
+      href={`/editor/${item.id}`}
       prefetch
     >
       <div>
-        <div className="h-[220px] rounded-xl relative overflow-hidden">
+        <div className="h-[300px] w-auto rounded-xl relative overflow-hidden">
           <CustomImage
             src={
               item.url
                 ? "/api/assets/" + item.url.replace("canvas/", "")
-                : "/tree.jpg"
+                : "/drawingPlaceholder.jpg"
             }
             alt={item.name}
             priority={true}
