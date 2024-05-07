@@ -40,11 +40,6 @@ const config: Config = {
         dark: "#0f1615",
         inactive: "#9fa2a1",
       },
-      // "base-100": {
-      //   light: "#fbffde",
-      //   dark: "#c8ccad",
-      //   inactive: "#fdfef2",
-      // },
       info: {
         light: "#40b1d6",
         dark: "#006885",
