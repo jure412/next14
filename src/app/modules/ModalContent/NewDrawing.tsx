@@ -103,13 +103,14 @@ const NewDrawing: React.FC<AuthenticationProps> = ({
     <FormProvider {...methods}>
       <form
         onSubmit={methods.handleSubmit(onSubmit)}
-        className="flex flex-col mt-8"
+        className="flex flex-col mt-8 gap-4"
       >
         <Input
           label="Name *"
           name="name"
           placeholder="name"
           validation={{
+            maxLength: { value: 16, message: "Max length is 16" },
             required: "Name is required",
           }}
         />
@@ -128,7 +129,7 @@ const NewDrawing: React.FC<AuthenticationProps> = ({
           <Button
             variant={ButtonVariant.TERTIARY}
             loading={isPending || loading}
-            className="mt-9"
+            className="mt-7"
             type="button"
             onClick={handleAddUser}
           >
