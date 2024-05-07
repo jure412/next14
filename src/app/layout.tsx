@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import Container from "./components/Container";
 import "./globals.css";
-import Header from "./modules/Header";
 import Provider from "./providers/index.provider";
 import { Redirect } from "./providers/Redirect.provider";
 
@@ -25,12 +23,7 @@ export default async function RootLayout({
         className={`bg-background relative`}
       >
         <Provider>
-          <Container>
-            <Redirect>
-              <Header />
-              {children}
-            </Redirect>
-          </Container>
+          <Redirect>{children}</Redirect>
           <ToastContainer />
         </Provider>
       </body>
