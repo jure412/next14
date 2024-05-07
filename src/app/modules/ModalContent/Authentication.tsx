@@ -156,7 +156,7 @@ const ResendVerification: React.FC<FormProps> = ({
     <FormProvider {...methods}>
       <form
         onSubmit={methods.handleSubmit(onSubmit)}
-        className="flex flex-col mt-8"
+        className="flex flex-col mt-8 gap-4"
       >
         <Input
           label="Email"
@@ -192,7 +192,7 @@ const SignUp: React.FC<FormProps> = ({
       <FormProvider {...methods}>
         <form
           onSubmit={methods.handleSubmit(onSubmit)}
-          className="flex flex-col mt-8"
+          className="flex flex-col mt-8  gap-4"
         >
           <Input
             label="Username"
@@ -270,7 +270,7 @@ const SignIn: React.FC<FormProps> = ({
       <FormProvider {...methods}>
         <form
           onSubmit={methods.handleSubmit(onSubmit)}
-          className="flex flex-col mt-8"
+          className="flex flex-col mt-8 gap-4"
         >
           <Input
             label="Email"
