@@ -10,6 +10,7 @@ export default function ClientUser() {
     queryKey: ["getMe"],
     queryFn: () => getMe(),
   });
+
   return (
     <div className="w-fit	 bg-white rounded-lg shadow-primary overflow-hidden my-3">
       {isLoading ? (

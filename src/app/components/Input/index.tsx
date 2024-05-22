@@ -9,6 +9,7 @@ const Input: React.FC<InputProps> = ({
   type = "text",
   validation,
   placeholder,
+  ...rest
 }) => {
   const { register, formState } = useFormContext();
   const { errors } = formState;
@@ -35,6 +36,7 @@ const Input: React.FC<InputProps> = ({
         {...register(name, validation)}
         type={type}
         placeholder={placeholder}
+        {...rest}
         className={`ease-in-out duration-300 block w-full 
         ${
           type === "range"

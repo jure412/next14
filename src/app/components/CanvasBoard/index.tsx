@@ -1,13 +1,13 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { BsBrush } from "react-icons/bs";
 import { FaSpinner } from "react-icons/fa";
 import { FaRegCircle } from "react-icons/fa6";
 import { RiEraserLine, RiRectangleLine, RiTriangleLine } from "react-icons/ri";
 import useCanvasTool from "../../helpers/hooks/useCanvas";
-import { getDrawingById } from "../../helpers/queries/index.client";
+import { getDrawingById, getMe } from "../../helpers/queries/index.client";
 import Input from "../Input";
 import InputColors from "../InputColor";
 import InputRowSelect from "../InputRowSelect";
@@ -16,6 +16,10 @@ import NextLink from "../NextLink";
 import Typography from "../Typography";
 
 export default function CanvasBoard({ id }: { id: string }) {
+  const { data: me, isLoading: isMeLoading } = useQuery({
+    queryKey: ["getMe"],
+    queryFn: () => getMe(),
+  });
   const { data, isLoading } = useQuery({
     queryKey: ["getDrawingById", id],
     queryFn: () => getDrawingById(id),
@@ -35,32 +39,17 @@ export default function CanvasBoard({ id }: { id: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const { isLoading: isCanvasLoading } = useCanvasTool({
+  const { isLoading: isCanvasLoading, isConnected } = useCanvasTool({
     watch,
     canvasRef,
     url: data?.data?.url,
     id,
+    meId: me.data?.user.id,
   });
-
-  useEffect(() => {
-    if (!isCanvasLoading) {
-      handleCenter();
-    }
-  }, [isCanvasLoading]);
-
-  const handleCenter = () => {
-    if (containerRef.current && canvasRef.current) {
-      const canvas = canvasRef.current;
-      canvas.scrollIntoView({
-        block: "center",
-        inline: "center",
-      });
-    }
-  };
 
   return (
     <div ref={containerRef} className={`bg-white cursor-crosshair relative`}>
-      {(isLoading || isCanvasLoading) && (
+      {(isLoading || isMeLoading || isCanvasLoading) && (
         <FaSpinner
           size={100}
           className="spinner-icon animate-spin fixed m-auto left-0 right-0 top-0 bottom-0"
@@ -69,6 +58,9 @@ export default function CanvasBoard({ id }: { id: string }) {
       <>
         <div className="fixed left-4 top-4 ">
           <Typography p>{data?.data?.name}</Typography>
+          <Typography p>
+            {isConnected ? "Is connected" : "Not connected"}
+          </Typography>
           <NextLink href={`/drawings`}>Go Back</NextLink>
         </div>
         <div className="flex justify-between align-center gap-4 z-10 fixed right-4 top-4 bg-background rounded-lg">
@@ -105,7 +97,7 @@ export default function CanvasBoard({ id }: { id: string }) {
                   },
                 ]}
               />
-              <Input label="Size" name="width" type="range" />
+              <Input min={2} max={100} label="Size" name="width" type="range" />
               <InputColors
                 label="Color"
                 name="color"

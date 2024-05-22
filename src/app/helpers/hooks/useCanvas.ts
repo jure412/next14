@@ -1,6 +1,8 @@
-"use client";
-import { debounce } from "lodash";
+import { debounce, forEach } from "lodash";
 import { useCallback, useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import short from "short-uuid";
+import { socket } from "../../../socket";
 import { saveDrawings } from "../../actions/drawing";
 
 interface CanvasToolProps {
@@ -8,14 +10,29 @@ interface CanvasToolProps {
   canvasRef: React.RefObject<HTMLCanvasElement>;
   url: string;
   id: string;
+  meId: string;
 }
 
-const useCanvasTool = ({ watch, canvasRef, url, id }: CanvasToolProps) => {
-  const [prevMouseX, setPrevMouseX] = useState<number | null>(null);
-  const [prevMouseY, setPrevMouseY] = useState<number | null>(null);
-  const [snapshot, setSnapshot] = useState<ImageData | null>(null);
-  const [isDrawing, setIsDrawing] = useState<boolean>(false);
+interface CustomCanvasContext extends CanvasRenderingContext2D {
+  isFilled?: boolean;
+  tool?: string;
+  prevMouseX?: number | null;
+  prevMouseY?: number | null;
+  isDrawing?: boolean;
+  snapshot?: any | null;
+  drawingId?: string;
+}
+
+const useCanvasTool = ({
+  watch,
+  canvasRef,
+  url,
+  id,
+  meId,
+}: CanvasToolProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [startSyncing, setStartSyncing] = useState<boolean>(false);
+  const [isConnected, setIsConnected] = useState<boolean>(false);
 
   const selectedTool = watch("tool");
   const brushWidth = watch("width");
@@ -36,186 +53,202 @@ const useCanvasTool = ({ watch, canvasRef, url, id }: CanvasToolProps) => {
     save();
   }, 500);
 
-  function setImage() {
-    // setIsLoading(true);
-
-    const ctx = canvasRef.current?.getContext("2d");
-    const image = new Image();
-    image.src = `${process.env.NEXTAUTH_URL}/api/assets/${url.replace(
-      "canvas/",
-      ""
-    )}`;
-    image.onload = function () {
-      ctx?.drawImage(image, 0, 0);
-      setIsLoading(false);
-    };
-  }
-
-  const createImage = async () => {
-    // setIsLoading(true);
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (ctx) {
-      ctx.fillStyle = "#fff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-    await save();
-    setIsLoading(false);
+  const drawingStart = (
+    e: MouseEvent,
+    brushWidth: number,
+    selectedTool: string,
+    selectedColor: string,
+    fillColor: boolean
+  ) => {
+    const ctx = canvasRef.current?.getContext("2d", {
+      willReadFrequently: true,
+    }) as CustomCanvasContext;
+    ctx!.isDrawing = true;
+    ctx!.lineWidth = brushWidth;
+    ctx!.strokeStyle = selectedTool === "eraser" ? "#fff" : selectedColor;
+    ctx!.fillStyle = selectedTool === "eraser" ? "#fff" : selectedColor;
+    ctx!.isFilled = fillColor;
+    ctx!.tool = selectedTool;
+    ctx!.prevMouseX = e.offsetX;
+    ctx!.prevMouseY = e.offsetY;
+    ctx!.snapshot = ctx?.getImageData(
+      0,
+      0,
+      ctx?.canvas.width!,
+      ctx?.canvas.height!
+    );
   };
-
-  //save image every 500ms after drawing
-
-  const startDraw = useCallback(
-    (e: MouseEvent) => {
-      setIsDrawing(true);
-      const offsetX = e.offsetX;
-      const offsetY = e.offsetY;
-      setPrevMouseX(offsetX);
-      setPrevMouseY(offsetY);
-      const ctx = canvasRef.current?.getContext("2d");
-      if (ctx) {
-        ctx.beginPath();
-        ctx.lineWidth = brushWidth;
-        ctx.strokeStyle = selectedColor;
-        ctx.fillStyle = selectedColor;
-        setSnapshot(
-          ctx.getImageData(
-            0,
-            0,
-            canvasRef.current!.width,
-            canvasRef.current!.height
-          )
-        );
-      }
-    },
-    [brushWidth, selectedColor]
-  );
 
   const drawing = useCallback(
     (e: MouseEvent) => {
-      if (!isDrawing) return;
-      const ctx = canvasRef.current?.getContext("2d");
-      if (!ctx || !prevMouseX || !prevMouseY || !snapshot) return;
-
-      ctx.putImageData(snapshot, 0, 0);
-
-      if (selectedTool === "brush" || selectedTool === "eraser") {
-        ctx.strokeStyle = selectedTool === "eraser" ? "#fff" : selectedColor;
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
-      } else if (selectedTool === "rectangle") {
-        drawRect(e, ctx);
-      } else if (selectedTool === "circle") {
-        drawCircle(e, ctx);
-      } else if (selectedTool === "triangle") {
-        drawTriangle(e, ctx);
+      const ctx = canvasRef.current?.getContext("2d") as CustomCanvasContext;
+      if (!ctx) return;
+      if (ctx?.tool === "brush" || ctx?.tool === "eraser") {
+        drawLine(e);
+      } else if (ctx?.tool === "rectangle") {
+        drawRect(e);
+      } else if (ctx?.tool === "circle") {
+        drawCircle(e);
+      } else if (ctx?.tool === "triangle") {
+        drawTriangle(e);
       }
     },
-    [isDrawing, prevMouseX, prevMouseY, snapshot, selectedTool, selectedColor]
+    [selectedTool, selectedColor, brushWidth, fillColor]
   );
 
-  const drawRect = (e: MouseEvent, ctx: CanvasRenderingContext2D) => {
-    if (!prevMouseX || !prevMouseY) return;
-    if (!snapshot) return;
+  const drawingEnd = () => {
+    const ctx = canvasRef.current?.getContext("2d") as CustomCanvasContext;
+    if (!ctx) return;
+    ctx.isDrawing = false;
+    ctx.prevMouseX = null;
+    ctx.prevMouseY = null;
+    ctx.snapshot = null;
+  };
 
-    if (!fillColor) {
+  const drawLine = (e: MouseEvent) => {
+    const ctx = canvasRef.current?.getContext("2d") as CustomCanvasContext;
+    if (!ctx.prevMouseX || !ctx.prevMouseY || !ctx.lineWidth) return;
+    ctx.beginPath();
+    ctx.moveTo(ctx.prevMouseX!, ctx.prevMouseY!);
+    ctx.lineTo(e.offsetX, e.offsetY);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(
+      e.offsetX!,
+      e.offsetY!,
+      ctx.lineWidth / 2,
+      0,
+      ctx.lineWidth * Math.PI
+    );
+    ctx.fill();
+    ctx.closePath();
+    ctx.prevMouseX = e.offsetX;
+    ctx.prevMouseY = e.offsetY;
+  };
+
+  const drawRect = (e: MouseEvent) => {
+    const ctx = canvasRef.current?.getContext("2d") as CustomCanvasContext;
+    if (!ctx.prevMouseX || !ctx.prevMouseY || !ctx.snapshot) return;
+    ctx.beginPath();
+    ctx.putImageData(ctx.snapshot, 0, 0);
+    if (!ctx.isFilled) {
       ctx.strokeRect(
         e.offsetX,
         e.offsetY,
-        prevMouseX - e.offsetX,
-        prevMouseY - e.offsetY
+        ctx?.prevMouseX! - e.offsetX,
+        ctx?.prevMouseY! - e.offsetY
       );
     } else {
       ctx.fillRect(
         e.offsetX,
         e.offsetY,
-        prevMouseX - e.offsetX,
-        prevMouseY - e.offsetY
+        ctx?.prevMouseX! - e.offsetX,
+        ctx?.prevMouseY! - e.offsetY
       );
     }
   };
 
-  const drawCircle = (e: MouseEvent, ctx: CanvasRenderingContext2D) => {
-    if (!prevMouseX || !prevMouseY) return;
-    if (!snapshot) return;
-
+  const drawCircle = (e: MouseEvent) => {
+    const ctx = canvasRef.current?.getContext("2d") as CustomCanvasContext;
+    if (!ctx.prevMouseX || !ctx.prevMouseY || !ctx.snapshot) return;
+    ctx.putImageData(ctx.snapshot, 0, 0);
     ctx.beginPath();
     const radius = Math.sqrt(
-      Math.pow(prevMouseX - e.offsetX, 2) + Math.pow(prevMouseY - e.offsetY, 2)
+      Math.pow(ctx.prevMouseX - e.offsetX, 2) +
+        Math.pow(ctx.prevMouseY - e.offsetY, 2)
     );
-    ctx.arc(prevMouseX, prevMouseY, radius, 0, 2 * Math.PI);
-    if (fillColor) {
+    ctx.arc(ctx.prevMouseX, ctx.prevMouseY, radius, 0, 2 * Math.PI);
+    if (ctx.isFilled) {
       ctx.fill();
     } else {
       ctx.stroke();
     }
   };
 
-  const drawTriangle = (e: MouseEvent, ctx: CanvasRenderingContext2D) => {
-    if (!prevMouseX || !prevMouseY) return;
-    if (!snapshot) return;
-
+  const drawTriangle = (e: MouseEvent) => {
+    const ctx = canvasRef.current?.getContext("2d") as CustomCanvasContext;
+    if (!ctx.prevMouseX || !ctx.prevMouseY || !ctx.snapshot) return;
+    ctx.putImageData(ctx.snapshot, 0, 0);
     ctx.beginPath();
-    ctx.moveTo(prevMouseX, prevMouseY);
+    ctx.moveTo(ctx.prevMouseX, ctx.prevMouseY);
     ctx.lineTo(e.offsetX, e.offsetY);
-    ctx.lineTo(prevMouseX * 2 - e.offsetX, e.offsetY);
+    ctx.lineTo(ctx.prevMouseX * 2 - e.offsetX, e.offsetY);
     ctx.closePath();
-    if (fillColor) {
+    if (ctx.isFilled) {
       ctx.fill();
     } else {
       ctx.stroke();
     }
   };
 
-  useEffect(() => {
+  function setImage(snap?: string) {
+    const ctx = canvasRef.current?.getContext("2d");
+    const image = new Image();
+    image.src =
+      snap ??
+      `${process.env.NEXTAUTH_URL}/api/assets/${url.replace("canvas/", "")}`;
+    image.onload = function () {
+      ctx?.drawImage(image, 0, 0);
+      setStartSyncing(true);
+    };
+  }
+
+  const createImage = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
 
     const ctx = canvas.getContext("2d");
     if (ctx) {
       ctx.fillStyle = "#fff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-  }, [canvasRef]);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (ctx) {
-      ctx.lineWidth = brushWidth;
-      ctx.strokeStyle = selectedColor;
-      ctx.fillStyle = selectedColor;
-    }
-  }, [brushWidth, selectedColor, canvasRef]);
-
-  useEffect(() => {
-    if (url === "") {
-      console.log("create image");
-      createImage();
-    }
-    if (url) {
-      console.log("swet image");
-      setImage();
-    }
-  }, [url]);
-
-  const mouseUp = () => {
-    debounceSaveOnChange();
-    setIsDrawing(false);
+    setStartSyncing(true);
   };
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    const handleMouseDown = (e: MouseEvent) => startDraw(e);
-    const handleMouseMove = (e: MouseEvent) => drawing(e);
+    const ctx = canvas?.getContext("2d") as CustomCanvasContext;
+    if (!canvas || isLoading || !startSyncing) return;
+
+    const handleMouseDown = (e: MouseEvent) => {
+      if (ctx?.isDrawing) return;
+      const id = short.generate();
+      ctx.drawingId = id;
+      drawingStart(
+        e as MouseEvent,
+        brushWidth,
+        selectedTool,
+        selectedColor,
+        fillColor
+      );
+      socket.emit("draw-start", {
+        drawignId: id,
+        offsetX: e.offsetX,
+        offsetY: e.offsetY,
+        brushWidth,
+        selectedTool,
+        selectedColor,
+        fillColor,
+      });
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!ctx.isDrawing) return;
+      drawing(e);
+      socket.emit("drawing", {
+        drawignId: ctx.drawingId,
+        roomId: id,
+        offsetX: e.offsetX,
+        offsetY: e.offsetY,
+      });
+    };
+
+    const mouseUp = () => {
+      if (!ctx.isDrawing) return;
+      drawingEnd();
+      socket.emit("draw-end", { drawignId: ctx.drawingId, roomId: id });
+      debounceSaveOnChange();
+    };
 
     canvas.addEventListener("mousedown", handleMouseDown);
     canvas.addEventListener("mousemove", handleMouseMove);
@@ -225,11 +258,109 @@ const useCanvasTool = ({ watch, canvasRef, url, id }: CanvasToolProps) => {
       canvas.removeEventListener("mousedown", handleMouseDown);
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseup", mouseUp);
-      // setIsLoading(true);
     };
-  }, [canvasRef, startDraw, drawing]);
+  }, [drawing, drawingStart, drawingEnd]);
 
-  return { isLoading };
+  useEffect(() => {
+    if (startSyncing) {
+      socket.emit("join-room", { id, meId });
+      socket.on("syncing-canvas", (userId, draw) => {
+        if (meId != userId) {
+          toast.info(`User joined the room.`);
+        }
+        if (meId === userId) {
+          forEach(draw, (d) => {
+            drawingStart(
+              {
+                offsetX: d.drawingStart.offsetX,
+                offsetY: d.drawingStart.offsetY,
+              } as MouseEvent,
+              d.drawingStart.brushWidth,
+              d.drawingStart.selectedTool,
+              d.drawingStart.selectedColor,
+              d.drawingStart.fillColor
+            );
+            if (d.drawing.length > 0) {
+              forEach(d.drawing, (draw) => {
+                drawing({
+                  offsetX: draw.offsetX,
+                  offsetY: draw.offsetY,
+                } as MouseEvent);
+              });
+            }
+            d.drawingEnd && drawingEnd();
+          });
+        }
+        setIsConnected(true);
+        setIsLoading(false);
+      });
+      socket.on(
+        "draw-start",
+        ({
+          offsetX,
+          offsetY,
+          brushWidth,
+          selectedTool,
+          selectedColor,
+          fillColor,
+        }) => {
+          drawingStart(
+            { offsetX, offsetY } as MouseEvent,
+            brushWidth,
+            selectedTool,
+            selectedColor,
+            fillColor
+          );
+        }
+      );
+
+      socket.on("drawing", ({ offsetX, offsetY }) => {
+        drawing({ offsetX, offsetY } as MouseEvent);
+      });
+
+      socket.on("draw-end", () => {
+        drawingEnd();
+      });
+
+      socket.on("user-disconnected", (disconectedUser) => {
+        if (disconectedUser[0] === meId) {
+          setIsConnected(false);
+        } else {
+          toast.info(`User left the room.`);
+        }
+      });
+
+      return () => {
+        socket.emit("handle-disconnect");
+        socket.off("user-disconnected");
+        socket.off("syncing-canvas");
+        socket.off("join-room");
+        socket.off("draw-start");
+        socket.off("drawing");
+        socket.off("draw-end");
+      };
+    }
+  }, [startSyncing]);
+
+  useEffect(() => {
+    if (url) {
+      if (!startSyncing) {
+        if (url === "") {
+          createImage();
+        }
+        if (url) {
+          setImage();
+        }
+        const canvas = canvasRef.current;
+        canvas.scrollIntoView({
+          block: "center",
+          inline: "center",
+        });
+      }
+    }
+  }, [url]);
+
+  return { isLoading, isConnected };
 };
 
 export default useCanvasTool;

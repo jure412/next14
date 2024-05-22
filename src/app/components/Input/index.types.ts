@@ -4,4 +4,6 @@ export type InputProps = {
   type?: string;
   validation?: any;
   placeholder?: string;
+  min?: number;
+  max?: number;
 };
