@@ -13,9 +13,5 @@ export async function middleware(req: NextRequest) {
   ) {
     return NextResponse.redirect(process.env.NEXTAUTH_URL + "/");
   }
-  // response.headers.append("Set-Cookie", "SameSite=None; Secure");
-  // cookies().set("pathname", pathname);
-  // const requestHeaders = new Headers(req.headers);
-  // requestHeaders.set("x-url", req.url);
   return response;
 }

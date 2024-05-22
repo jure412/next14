@@ -343,7 +343,7 @@ const useCanvasTool = ({
   }, [startSyncing]);
 
   useEffect(() => {
-    if (url) {
+    if (url || url === "") {
       if (!startSyncing) {
         if (url === "") {
           createImage();
@@ -352,7 +352,7 @@ const useCanvasTool = ({
           setImage();
         }
         const canvas = canvasRef.current;
-        canvas.scrollIntoView({
+        canvas?.scrollIntoView({
           block: "center",
           inline: "center",
         });
