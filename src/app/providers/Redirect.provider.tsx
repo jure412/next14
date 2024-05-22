@@ -10,8 +10,12 @@ export const Redirect = ({ children }: { children: React.ReactNode }) => {
     queryKey: ["getMe"],
     queryFn: () => getMe(),
   });
-  const protectedRoutes = "/drawings";
-  if (isFetched && !data?.isAuth && pathname.includes(protectedRoutes)) {
+
+  if (
+    isFetched &&
+    !data?.isAuth &&
+    (pathname.startsWith("/drawings") || pathname.startsWith("/editor"))
+  ) {
     router.push("/");
   }
   return <>{children}</>;

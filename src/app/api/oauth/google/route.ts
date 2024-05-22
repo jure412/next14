@@ -15,7 +15,6 @@ interface GoogleUser {
 }
 
 export const GET = async (req: NextRequest) => {
-  console.log(req.url);
   const url = new URL(req.url);
   const searchParams = url.searchParams;
   const code = searchParams.get("code");

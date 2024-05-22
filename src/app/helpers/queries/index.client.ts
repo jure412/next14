@@ -4,7 +4,6 @@ export const getDrawings = async (
 ): Promise<any> => {
   const response = options ? await fetch(url, options) : await fetch(url);
   const drawings = await response.json();
-  console.log({ drawings });
   return drawings;
 };
 

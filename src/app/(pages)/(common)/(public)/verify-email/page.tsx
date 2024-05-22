@@ -1,11 +1,10 @@
 "use client";
-// import { verifyEmail } from "./app/actions/auth";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
-import { verifyEmail } from "../../actions/auth";
-import Button from "../../components/Button";
-import Typography from "../../components/Typography";
+import { verifyEmail } from "../../../../actions/auth";
+import Button from "../../../../components/Button";
+import Typography from "../../../../components/Typography";
 
 const VerifyEmailPage = ({
   searchParams: { token },

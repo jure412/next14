@@ -7,7 +7,9 @@ export async function middleware(req: NextRequest) {
   const cookieExists = cookies().get("auth_session");
   if (
     !cookieExists &&
-    (pathname.startsWith("/drawings") || pathname.startsWith("/api/assets/"))
+    (pathname.startsWith("/drawings") ||
+      pathname.startsWith("/editor") ||
+      pathname.startsWith("/api/assets/"))
   ) {
     return NextResponse.redirect(process.env.NEXTAUTH_URL + "/");
   }

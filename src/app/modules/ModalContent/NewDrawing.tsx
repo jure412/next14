@@ -27,15 +27,14 @@ const NewDrawing: React.FC<AuthenticationProps> = ({
 
   const methods = useForm<NewDrawingsValuesProps>({
     defaultValues,
+    reValidateMode: "onSubmit",
   });
 
   const onSubmit = async (values: NewDrawingsValuesProps) => {
-    setLoading(true);
     mutate({
       name: values.name,
       users: values.users,
     });
-    setLoading(false);
   };
 
   const queryClient = useQueryClient();
@@ -104,13 +103,14 @@ const NewDrawing: React.FC<AuthenticationProps> = ({
     <FormProvider {...methods}>
       <form
         onSubmit={methods.handleSubmit(onSubmit)}
-        className="flex flex-col mt-8"
+        className="flex flex-col mt-8 gap-4"
       >
         <Input
           label="Name *"
           name="name"
           placeholder="name"
           validation={{
+            maxLength: { value: 16, message: "Max length is 16" },
             required: "Name is required",
           }}
         />
@@ -128,8 +128,8 @@ const NewDrawing: React.FC<AuthenticationProps> = ({
           />
           <Button
             variant={ButtonVariant.TERTIARY}
-            loading={loading}
-            className="mt-9"
+            loading={isPending || loading}
+            className="mt-7"
             type="button"
             onClick={handleAddUser}
           >

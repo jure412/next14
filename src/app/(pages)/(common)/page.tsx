@@ -1,10 +1,10 @@
-import Button from "./components/Button";
-import { ButtonVariant } from "./components/Button/index.types";
-import CustomImage from "./components/CustomImage";
-import { LinkVariant } from "./components/Link/index.types";
-import NextLink from "./components/NextLink";
-import Typography from "./components/Typography";
-import ClientUser from "./modules/ClientUser";
+import Button from "../../components/Button";
+import { ButtonVariant } from "../../components/Button/index.types";
+import CustomImage from "../../components/CustomImage";
+import { LinkVariant } from "../../components/Link/index.types";
+import NextLink from "../../components/NextLink";
+import Typography from "../../components/Typography";
+import ClientUser from "../../modules/ClientUser";
 
 export default async function Home() {
   return (

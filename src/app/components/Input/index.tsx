@@ -9,11 +9,10 @@ const Input: React.FC<InputProps> = ({
   type = "text",
   validation,
   placeholder,
+  ...rest
 }) => {
-  const {
-    register,
-    formState: { errors },
-  } = useFormContext();
+  const { register, formState } = useFormContext();
+  const { errors } = formState;
   const error = errors[name];
 
   useEffect(() => {
@@ -24,18 +23,35 @@ const Input: React.FC<InputProps> = ({
   }, [error]);
 
   return (
-    <div className="mb-4 w-full">
-      <label
-        htmlFor={name}
-        className="block text-sm font-medium text-neutral-dark mb-4"
-      >
-        {label}
-      </label>
+    <div className="w-full">
+      {label && (
+        <label
+          htmlFor={name}
+          className="block text-sm font-medium text-neutral-dark mb-2"
+        >
+          {label}
+        </label>
+      )}
       <input
         {...register(name, validation)}
         type={type}
         placeholder={placeholder}
-        className={`ease-in-out duration-300 mt-1 px-6 py-4 block w-full rounded-md border-neutral-light shadow-primary focus:shadow-none focus:border-primary-dark focus:ring focus:ring-primary-light focus:ring-opacity-80 `}
+        {...rest}
+        className={`ease-in-out duration-300 block w-full 
+        ${
+          type === "range"
+            ? `
+              w-full h-[20px] border border-primary-dark accent-accent-dark px-1 rounded-lg appearance-none cursor-pointer range-sm 
+            `
+            : `
+            mt-1 
+            py-4 
+            px-6 rounded-md border-neutral-light shadow-primary
+            focus:shadow-none focus:border-primary-dark
+            focus:ring focus:ring-primary-light
+            focus:ring-opacity-80
+            `
+        }`}
       />
     </div>
   );

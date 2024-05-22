@@ -36,12 +36,12 @@ export const GET = async (
     });
 
     if (!userDrawings) {
-      throw new Error("Drawing not found for this user");
+      throw new Error("No drawings found for this user");
     }
 
     return NextResponse.json({
       success: true,
-      msg: ["User drawings retrieved successfully"],
+      msg: ["No drawings retrieved successfully"],
       data: userDrawings,
     });
   } catch (error: any) {

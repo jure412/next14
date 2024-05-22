@@ -41,10 +41,10 @@ const Authentication: React.FC<AuthenticationProps> = ({
   const queryClient = useQueryClient();
 
   const [step, setStep] = useState<number>(1);
-  const [loading, setLoading] = useState<boolean>(false);
   const methods = useForm<Values>({
     defaultValues:
       step === 1 ? singInValues : step === 2 ? singUpValues : ResendValues,
+    reValidateMode: "onSubmit",
   });
 
   const onSubmit = async (values: Values) => {
@@ -73,9 +73,7 @@ const Authentication: React.FC<AuthenticationProps> = ({
   });
 
   const handleGoogleSubmit = async () => {
-    setLoading(true);
     const res = await createGoogleAuthorizationURL();
-    setLoading(false);
     if (!res?.success) {
       toast.error(res.msg[0]);
     } else if (res.success) {
@@ -158,7 +156,7 @@ const ResendVerification: React.FC<FormProps> = ({
     <FormProvider {...methods}>
       <form
         onSubmit={methods.handleSubmit(onSubmit)}
-        className="flex flex-col mt-8"
+        className="flex flex-col mt-8 gap-4"
       >
         <Input
           label="Email"
@@ -194,7 +192,7 @@ const SignUp: React.FC<FormProps> = ({
       <FormProvider {...methods}>
         <form
           onSubmit={methods.handleSubmit(onSubmit)}
-          className="flex flex-col mt-8"
+          className="flex flex-col mt-8  gap-4"
         >
           <Input
             label="Username"
@@ -272,7 +270,7 @@ const SignIn: React.FC<FormProps> = ({
       <FormProvider {...methods}>
         <form
           onSubmit={methods.handleSubmit(onSubmit)}
-          className="flex flex-col mt-8"
+          className="flex flex-col mt-8 gap-4"
         >
           <Input
             label="Email"

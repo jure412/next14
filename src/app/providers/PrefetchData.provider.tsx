@@ -16,7 +16,11 @@ export const PrefetchData = async ({
   const queryClient = getQueryClient();
 
   queryClient.setDefaultOptions({
-    queries: { staleTime: 1000 * 60, gcTime: 10 * 1000 },
+    queries: {
+      staleTime: 1000 * 60,
+      gcTime: 10 * 1000,
+      refetchOnWindowFocus: false,
+    },
   });
 
   await queryClient.prefetchQuery({
