@@ -186,7 +186,10 @@ const useCanvasTool = ({
     const image = new Image();
     image.src =
       snap ??
-      `${process.env.NEXTAUTH_URL}/api/assets/${url.replace("canvas/", "")}`;
+      `${process.env.NEXTAUTH_URL}/api/assets/${url.replace(
+        "canvas/",
+        ""
+      )}?=${new Date().getTime()}`;
     image.onload = function () {
       ctx?.drawImage(image, 0, 0);
       setStartSyncing(true);
