@@ -1,16 +1,25 @@
+import { UseMutateFunction } from "@tanstack/react-query";
 import { debounce, forEach } from "lodash";
 import { useCallback, useEffect, useState } from "react";
+import { UseFormWatch } from "react-hook-form";
 import { toast } from "react-toastify";
 import short from "short-uuid";
 import { socket } from "../../../socket";
-import { saveDrawings } from "../../actions/drawing";
 
 interface CanvasToolProps {
-  watch: any;
+  watch: UseFormWatch<WatchProps>;
   canvasRef: React.RefObject<HTMLCanvasElement>;
   url: string;
   id: string;
   meId: string;
+  mutate: UseMutateFunction<any, unknown, FormData, unknown>;
+}
+
+interface WatchProps {
+  tool: string;
+  width: number;
+  color: string;
+  fill: boolean;
 }
 
 interface CustomCanvasContext extends CanvasRenderingContext2D {
@@ -29,6 +38,7 @@ const useCanvasTool = ({
   url,
   id,
   meId,
+  mutate,
 }: CanvasToolProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [startSyncing, setStartSyncing] = useState<boolean>(false);
@@ -39,13 +49,13 @@ const useCanvasTool = ({
   const selectedColor = watch("color");
   const fillColor = watch("fill");
 
-  async function save() {
+  function save() {
     if (canvasRef.current) {
       const dataUrl = canvasRef.current.toDataURL();
       const formData = new FormData();
       formData.append("drawingId", id);
       formData.append("canvas", dataUrl);
-      await saveDrawings(formData);
+      mutate(formData);
     }
   }
 
@@ -179,33 +189,6 @@ const useCanvasTool = ({
     } else {
       ctx.stroke();
     }
-  };
-
-  function setImage(snap?: string) {
-    const ctx = canvasRef.current?.getContext("2d");
-    const image = new Image();
-    image.src =
-      snap ??
-      `${process.env.NEXTAUTH_URL}/api/assets/${url.replace(
-        "canvas/",
-        ""
-      )}?=${new Date().getTime()}`;
-    image.onload = function () {
-      ctx?.drawImage(image, 0, 0);
-      setStartSyncing(true);
-    };
-  }
-
-  const createImage = async () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (ctx) {
-      ctx.fillStyle = "#fff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-    setStartSyncing(true);
   };
 
   useEffect(() => {
@@ -346,20 +329,45 @@ const useCanvasTool = ({
   }, [startSyncing]);
 
   useEffect(() => {
-    if (url || url === "") {
-      if (!startSyncing) {
-        if (url === "") {
-          createImage();
-        }
-        if (url) {
-          setImage();
-        }
-        const canvas = canvasRef.current;
-        canvas?.scrollIntoView({
-          block: "center",
-          inline: "center",
-        });
+    const setImage = async (snap?: string) => {
+      const ctx = canvasRef.current?.getContext("2d");
+      const image = new Image();
+      image.src =
+        snap ??
+        `${process.env.NEXTAUTH_URL}/api/assets/${url.replace(
+          "canvas/",
+          ""
+        )}?=${new Date().getTime()}`;
+      image.onload = function () {
+        ctx?.drawImage(image, 0, 0);
+        setStartSyncing(true);
+      };
+    };
+
+    const createImage = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
+      save();
+      setStartSyncing(true);
+    };
+
+    if (!startSyncing) {
+      if (url === "") {
+        createImage();
+      } else {
+        setImage();
+      }
+      const canvas = canvasRef.current;
+      canvas?.scrollIntoView({
+        block: "center",
+        inline: "center",
+      });
     }
   }, [url]);
 
