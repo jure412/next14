@@ -1,11 +1,13 @@
 "use client";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { BsBrush } from "react-icons/bs";
 import { FaSpinner } from "react-icons/fa";
 import { FaRegCircle } from "react-icons/fa6";
 import { RiEraserLine, RiRectangleLine, RiTriangleLine } from "react-icons/ri";
+import { toast } from "react-toastify";
+import { saveDrawings } from "../../actions/drawing";
 import useCanvasTool from "../../helpers/hooks/useCanvas";
 import { getDrawingById, getMe } from "../../helpers/queries/index.client";
 import Input from "../Input";
@@ -23,6 +25,37 @@ export default function CanvasBoard({ id }: { id: string }) {
   const { data, isLoading } = useQuery({
     queryKey: ["getDrawingById", id],
     queryFn: () => getDrawingById(id),
+  });
+
+  const queryClient = useQueryClient();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: saveDrawings,
+    onMutate: async (values: any) => {
+      await queryClient.cancelQueries({ queryKey: ["getDrawingById", id] });
+      const drawing: any = queryClient.getQueryData(["getDrawingById", id]);
+      const updatedDrawing = {
+        ...drawing,
+        data: { ...drawing.data, url: `canvas/${id}` },
+      };
+
+      queryClient.setQueryData(["getDrawingById", id], updatedDrawing);
+      return updatedDrawing;
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+    onSuccess: (data) => {
+      if (!data?.success) {
+        toast.error(data?.msg?.[0]);
+      }
+      // else {
+      //   toast.success(data?.msg?.[0]);
+      // }
+    },
+    onSettled() {
+      queryClient.invalidateQueries({ queryKey: ["getDrawingById", id] });
+    },
   });
 
   const methods = useForm({
@@ -45,6 +78,7 @@ export default function CanvasBoard({ id }: { id: string }) {
     url: data?.data?.url,
     id,
     meId: me.data?.user.id,
+    mutate,
   });
 
   return (
