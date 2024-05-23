@@ -369,9 +369,6 @@ const useCanvasTool = ({
         inline: "center",
       });
     }
-    return () => {
-      setStartSyncing(false);
-    };
   }, [url]);
 
   return { isLoading, isConnected };
