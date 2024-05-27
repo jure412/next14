@@ -7,10 +7,12 @@ import Link from "../Link";
 import { LinkVariant } from "../Link/index.types";
 
 export default function Modal({
+  id,
   linkType,
   linkChildren,
   children,
 }: React.PropsWithChildren<{
+  id?: string;
   linkChildren: React.ReactNode;
   linkType: LinkVariant;
 }>) {
@@ -49,7 +51,7 @@ export default function Modal({
 
   return (
     <>
-      <div>
+      <div id={id ?? ""}>
         <Link variant={linkType} handleClick={() => setIsOpen(true)}>
           {linkChildren}
         </Link>

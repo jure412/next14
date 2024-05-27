@@ -22,6 +22,7 @@ const Page = async () => {
       <div className="flex gap-4 flex-col">
         <div className="my-8 self-end">
           <Modal
+            id="createNewDrawing"
             linkType={LinkVariant.SECONDARY}
             linkChildren={<MdDraw size={20} />}
           >
