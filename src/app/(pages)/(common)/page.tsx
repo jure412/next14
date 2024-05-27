@@ -9,8 +9,8 @@ import ClientUser from "../../modules/ClientUser";
 export default async function Home() {
   return (
     <>
-      <div className="my-8">
-        <ClientUser />
+      <ClientUser id={"clientUser"} />
+      <div id={"typographySection"} className="my-8 w-auto">
         <Typography h1>Heading 1</Typography>
         <Typography h2>heading 2</Typography>
         <Typography h3>heading 3</Typography>
@@ -19,6 +19,7 @@ export default async function Home() {
         <Typography className="text-sm">span</Typography>
       </div>
       <CustomImage
+        id={"customImage"}
         className="my-8"
         src="/tree.jpg"
         alt="placeholder"
@@ -26,7 +27,7 @@ export default async function Home() {
         height={1008}
         priority={true}
       />
-      <div className="my-8 flex gap-4 flex-wrap">
+      <div id={"buttonSection"} className="my-8 flex gap-4 flex-wrap">
         <Button loading={false} variant={ButtonVariant.PRIMARY}>
           Primary
         </Button>
@@ -64,7 +65,7 @@ export default async function Home() {
           Loading
         </Button>
       </div>
-      <div className="flex my-8 gap-4">
+      <div id={"linkSection"} className="flex my-8 gap-4">
         <NextLink prefetch href="/">
           NextLink
         </NextLink>
