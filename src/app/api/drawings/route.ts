@@ -1,9 +1,17 @@
 import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../prisma/prismaClient";
 
-export const GET = async () => {
+export const GET = async (req: NextRequest) => {
+  const url = new URL(req.url);
+  const searchParams = url.searchParams;
+  const skip = Number(searchParams.get("skip"));
+  const take = Number(searchParams.get("take"));
+
   try {
+    if ((!skip || !take) && (isNaN(skip) || isNaN(take))) {
+      throw new Error("Invalid skip or take params");
+    }
     const sessionId: any = cookies().get("auth_session")?.value;
     if (!sessionId) {
       throw new Error("No sessionId found");
@@ -18,9 +26,16 @@ export const GET = async () => {
       where: {
         userId: sessionUser?.userId,
       },
+      skip: skip,
+      take: take,
       include: {
         drawing: true,
         user: true,
+      },
+    });
+    const userDrawingCount = await prisma.userDrawing.count({
+      where: {
+        userId: sessionUser?.userId,
       },
     });
     if (!userDrawings) {
@@ -30,6 +45,7 @@ export const GET = async () => {
       success: true,
       msg: ["User drawings retrieved successfully"],
       data: userDrawings,
+      count: userDrawingCount,
     });
   } catch (error: any) {
     return NextResponse.json({

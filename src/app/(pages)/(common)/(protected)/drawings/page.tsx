@@ -10,12 +10,18 @@ import { getQueryClient } from "../../../../providers/PrefetchData.provider";
 
 const Page = async () => {
   const queryClient = getQueryClient();
-  await queryClient.prefetchQuery({
+  await queryClient.prefetchInfiniteQuery({
     queryKey: ["getDrawings"],
     queryFn: () =>
-      getDrawings(process.env.NEXTAUTH_URL + "/api/drawings", {
-        headers: headers(),
+      getDrawings({
+        url: `${process.env.NEXTAUTH_URL}/api/drawings`,
+        options: {
+          headers: headers(),
+        },
+        skip: 0,
+        take: 24,
       }),
+    initialPageParam: { skip: 0, take: 24 },
   });
   return (
     <div>
@@ -29,7 +35,7 @@ const Page = async () => {
             <NewDrawing />
           </Modal>
         </div>
-        <div className="grid 2xl:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-4">
+        <div className="grid 2xl:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-4 mb-4">
           <HydrationBoundary state={dehydrate(queryClient)}>
             <DrawingsList />
           </HydrationBoundary>

@@ -41,17 +41,18 @@ const NewDrawing: React.FC<AuthenticationProps> = ({
 
   const { mutate, isPending } = useMutation({
     mutationFn: newDrawing,
-    onMutate: async (values: NewDrawingsValuesProps) => {
-      await queryClient.cancelQueries({ queryKey: ["getDrawings"] });
-      const prevDrawings: any = queryClient.getQueryData(["getDrawings"]);
-      const updatedDrawings = {
-        ...prevDrawings,
-        data: [...prevDrawings.data, { drawing: { name: values.name } }],
-      };
+    // onMutate: async (values: NewDrawingsValuesProps) => {
+    //   await queryClient.cancelQueries({ queryKey: ["getDrawings"] });
+    //   const prevDrawings: any = queryClient.getQueryData(["getDrawings"]);
+    //   console.log(prevDrawings);
+    //   const updatedDrawings = {
+    //     ...prevDrawings,
+    //     data: [...prevDrawings.data, { drawing: { name: values.name } }],
+    //   };
 
-      queryClient.setQueryData(["getDrawings"], updatedDrawings);
-      return prevDrawings;
-    },
+    //   queryClient.setQueryData(["getDrawings"], updatedDrawings);
+    //   return prevDrawings;
+    // },
     onError: (error) => {
       toast.error(error.message);
     },
