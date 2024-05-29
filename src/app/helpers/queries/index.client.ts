@@ -1,8 +1,17 @@
-export const getDrawings = async (
-  url: string = "/api/drawings",
-  options?: RequestInit
-): Promise<any> => {
-  const response = options ? await fetch(url, options) : await fetch(url);
+export const getDrawings = async ({
+  url = "/api/drawings",
+  skip,
+  take,
+  options,
+}: {
+  url?: string;
+  skip?: number;
+  take?: number;
+  options?: RequestInit;
+}): Promise<any> => {
+  const response = options
+    ? await fetch(`${url}?skip=${skip}&take=${take}`, options)
+    : await fetch(`${url}?skip=${skip}&take=${take}`);
   const drawings = await response.json();
   return drawings;
 };
