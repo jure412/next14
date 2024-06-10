@@ -19,7 +19,7 @@ export default function DrawingsList() {
         const take = initialPageParam.take;
         let drawingsDisplayed = 0;
         allParmas.forEach(
-          (param: any) => (drawingsDisplayed += param.data.length)
+          (param: any) => (drawingsDisplayed += param?.data?.length)
         );
         const drawingsLeft = lastParams.count - drawingsDisplayed;
         if (drawingsLeft > 0) {
