@@ -4,7 +4,7 @@ import { getMe } from "../../actions/auth";
 import Container from "../../components/Container";
 import NextLink from "../../components/NextLink";
 import { LinkVariant } from "../../components/NextLink/index.types";
-import ClientPart from "./client";
+import ClientHeader from "./clientHeader";
 
 const Header: React.FC = async () => {
   const getMeData = await getMe();
@@ -20,7 +20,7 @@ const Header: React.FC = async () => {
           >
             <CiAirportSign1 size={50} />
           </NextLink>
-          <ClientPart getMeData={getMeData} />
+          <ClientHeader getMeData={getMeData} />
         </div>
       </Container>
     </header>

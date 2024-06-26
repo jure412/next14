@@ -18,7 +18,7 @@ import { LinkVariant } from "../../components/NextLink/index.types";
 import { pageTour } from "../../helpers/functions/client";
 import Authentication from "../ModalContent/Authentication";
 
-const ClientPart: any = ({ getMeData }: any) => {
+const ClientHeader: any = ({ getMeData }: any) => {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const queryClient = useQueryClient();
@@ -141,4 +141,4 @@ const ClientPart: any = ({ getMeData }: any) => {
   );
 };
 
-export default ClientPart;
+export default ClientHeader;

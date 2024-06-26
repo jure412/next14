@@ -67,15 +67,11 @@ const Authentication: React.FC<AuthenticationProps> = ({
         setIsOpen?.(false);
       }
     },
-    onSettled(data, error, variables, context) {
-      // queryClient.invalidateQueries({
-      //   queryKey: ["getMe"],
-      // });
+    onSettled() {
       step === 1 &&
         queryClient.invalidateQueries({
           queryKey: ["getMe"],
         });
-      // step === 1 && queryClient.setQueryData(["getMe"], data);
     },
   });
 

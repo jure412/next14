@@ -1,6 +1,7 @@
 import React from "react";
 import CustomImage from "../../components/CustomImage";
 import NextLink from "../../components/NextLink";
+import { base64 } from "../../helpers/base64";
 
 interface CardProps {
   item: {
@@ -28,7 +29,7 @@ const Card: React.FC<CardProps> = ({ item }) => {
             }
             alt={item.name}
             sizes="400px"
-            blurDataURL={item?.blurDataURL}
+            blurDataURL={item?.blurDataURL ?? base64}
             className="object-cover"
             fill={true}
             loading={"lazy"}

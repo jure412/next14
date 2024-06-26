@@ -1,5 +1,7 @@
 import fs from "fs";
+import { headers } from "next/headers";
 import path from "path";
+import { getPlaiceholder } from "plaiceholder";
 
 export const saveBase64ImageToFile = (
   base64Image: File,
@@ -50,4 +52,46 @@ export async function* nodeStreamToIterator(stream: fs.ReadStream) {
   for await (const chunk of stream) {
     yield new Uint8Array(chunk);
   }
+}
+
+export async function getBase64(imageUrl: string) {
+  try {
+    const res = await fetch(imageUrl, { headers: headers() });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch image: ${res.status} ${res.statusText}`);
+    }
+
+    const buffer = await res.arrayBuffer();
+
+    const { base64 } = await getPlaiceholder(Buffer.from(buffer));
+
+    return base64;
+  } catch (e) {
+    if (e instanceof Error) console.log(e.stack);
+  }
+}
+
+export async function addBlurredDataUrls(
+  data: any,
+  nestedProps: string
+): Promise<any[]> {
+  const nestedPropsArray = nestedProps.split(".");
+  const base64Promises = data.map((item) => {
+    const url = item[nestedPropsArray[0]][nestedPropsArray[1]]
+      ? item[nestedPropsArray[0]][nestedPropsArray[1]].replace(
+          "canvas",
+          "/api/assets"
+        )
+      : null;
+    return getBase64(process.env.APP_URL + url);
+  });
+  const base64Results = await Promise.all(base64Promises);
+
+  const photosWithBlur: any[] = data.map((item, i) => {
+    item[nestedPropsArray[0]]["blurDataURL"] = base64Results[i];
+    return item;
+  });
+
+  return photosWithBlur;
 }

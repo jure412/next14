@@ -2,12 +2,9 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { usePathname, useRouter } from "next/navigation";
 import { ReactNode, useState } from "react";
 
 const QueryProvider = ({ children }: { children: ReactNode }) => {
-  const pathname = usePathname();
-  const { push } = useRouter();
   const [queryClient] = useState(
     () =>
       new QueryClient({

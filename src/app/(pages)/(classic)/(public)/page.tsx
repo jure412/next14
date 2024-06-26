@@ -6,8 +6,8 @@ import CustomImage from "../../../components/CustomImage";
 import { LinkVariant } from "../../../components/Link/index.types";
 import NextLink from "../../../components/NextLink";
 import Typography from "../../../components/Typography";
+import { getBase64 } from "../../../helpers/functions/server";
 import ClientUser from "../../../modules/ClientUser";
-import { getBase64 } from "../fn";
 
 export default async function Home() {
   const getMeData = await getMe();

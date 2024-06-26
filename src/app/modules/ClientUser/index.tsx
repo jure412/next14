@@ -12,7 +12,7 @@ export default function ClientUser({
   id?: string;
   getMeData: any;
 }) {
-  const { data, isLoading, isRefetching, isFetching } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["getMe"],
     initialData: getMeData,
     queryFn: () => getMe(),
