@@ -2,11 +2,15 @@ import fs from "fs";
 import path from "path";
 
 export const saveBase64ImageToFile = (
-  base64Image: string,
-  id: string
+  base64Image: File,
+  id: number
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
-    const matches = base64Image.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
+    const base64ImageString = base64Image.toString() as string;
+
+    const matches = base64ImageString.match(
+      /^data:([A-Za-z-+/]+);base64,(.+)$/
+    );
 
     if (matches && matches.length === 3) {
       const imageData = matches[2];

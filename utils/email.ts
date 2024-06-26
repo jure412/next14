@@ -27,7 +27,6 @@ export async function sendEmail({
   subject: string;
   html: string;
 }) {
-  console.log("sending email", process.env.GMAIL_PASS.replaceAll("-", " "));
   await transporter.sendMail({
     from: `"Jure" <${process.env.GMAIL_USER}>`, // sender address
     to, // list of receivers

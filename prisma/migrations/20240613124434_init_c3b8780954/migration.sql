@@ -7,6 +7,7 @@ CREATE TABLE "User" (
     "profileImageUrl" TEXT,
     "hashedPassword" TEXT,
     "emailVerified" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -45,16 +46,18 @@ CREATE TABLE "OAauth" (
 
 -- CreateTable
 CREATE TABLE "Drawing" (
-    "id" TEXT NOT NULL,
+    "id" SERIAL NOT NULL,
     "url" TEXT DEFAULT '',
     "name" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Drawing_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "UserDrawing" (
-    "drawingId" TEXT NOT NULL,
+    "drawingId" INTEGER NOT NULL,
     "userId" TEXT NOT NULL,
 
     CONSTRAINT "UserDrawing_pkey" PRIMARY KEY ("drawingId","userId")

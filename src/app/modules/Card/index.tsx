@@ -4,9 +4,10 @@ import NextLink from "../../components/NextLink";
 
 interface CardProps {
   item: {
-    id: string;
+    id: number;
     url: string;
     name: string;
+    blurDataURL: string;
   };
 }
 
@@ -15,7 +16,7 @@ const Card: React.FC<CardProps> = ({ item }) => {
     <NextLink
       className="bg-white rounded-lg shadow-primary p-4"
       href={`/editor/${item.id}`}
-      prefetch
+      scroll={false}
     >
       <div>
         <div className="h-[300px] w-auto rounded-xl relative overflow-hidden">
@@ -23,12 +24,15 @@ const Card: React.FC<CardProps> = ({ item }) => {
             src={
               item.url
                 ? "/api/assets/" + item.url.replace("canvas/", "")
-                : "/drawingPlaceholder.jpg"
+                : "/images/drawingPlaceholder.jpg"
             }
             alt={item.name}
-            priority={true}
+            sizes="400px"
+            blurDataURL={item?.blurDataURL}
             className="object-cover"
             fill={true}
+            loading={"lazy"}
+            placeholder="blur"
           />
         </div>
         <h2 className="text-xl font-semibold mt-8">{item.name}</h2>

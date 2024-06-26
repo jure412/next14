@@ -1,8 +1,6 @@
-# version: "3.9"
-
 services:
   db:
-    image: postgres
+    image: postgres:latest
     container_name: db_container
     restart: always
     env_file:
@@ -10,14 +8,14 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - db:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/datatwo
 
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin_container
     restart: always
     ports:
-      - "8888:80"
+      - "8881:80"
     env_file:
       - .env
     volumes:

@@ -42,20 +42,22 @@ for i in $(seq 1 $MAX_ATTEMPTS); do
 done
 
 if [ "$db_reachable" = true ]; then
-  echo "Applying Prisma migrations..."
-  # npx prisma migrate dev --name init
-  # Check if the prisma/migrations folder exists and is not empty
-  # if [ -d "prisma/migrations" ] && [ -n "$(ls -A prisma/migrations)" ]; then
-  # If migrations exist, create a new one
-  # echo "Applying Prisma migrations...   npx prisma migrate dev --name init"
-  # npx prisma migrate deploy
-  npx prisma migrate dev --name init
+  # echo "Applying Prisma migrations..."
+RUN npx prisma generate
+mapfile -t MIGRATION_STATUS < <(npx prisma migrate status)
+RANDOM_STRING=$(openssl rand -hex 5)  
+echo "Migration status: $MIGRATION_STATUS"
+echo "Migrations count: $MIGRATION_COUNT"
 
-  # else
-  #   # If no migrations exist, run the latest one
-  #   echo "Applying Prisma migrations...      npx prisma migrate deploy"
-  #   npx prisma migrate deploy
-  # fi
+  if [[ $MIGRATION_STATUS == *"Database schema is up to date"* ]]; then
+    echo "Prisma migrations are up to date. Skipping migrations and seeding."
+  else
+    echo "Applying Prisma migrations..."
+    npx prisma migrate dev --name init_$RANDOM_STRING
+    echo "Seeding database..."
+    npx prisma db seed
+  fi
+
 else
   echo "Skipping Prisma migrations due to unreachable database."
 fi

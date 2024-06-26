@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
+import { addBlurredDataUrls } from "../../(pages)/(classic)/fn";
 import { prisma } from "../../../../prisma/prismaClient";
 
 export const GET = async (req: NextRequest) => {
@@ -26,6 +27,11 @@ export const GET = async (req: NextRequest) => {
       where: {
         userId: sessionUser?.userId,
       },
+      orderBy: {
+        drawing: {
+          id: "desc",
+        },
+      },
       skip: skip,
       take: take,
       include: {
@@ -33,18 +39,23 @@ export const GET = async (req: NextRequest) => {
         user: true,
       },
     });
+    const userDrawingsWithBlurredUrl = await addBlurredDataUrls(
+      userDrawings,
+      "drawing.url"
+    );
     const userDrawingCount = await prisma.userDrawing.count({
       where: {
         userId: sessionUser?.userId,
       },
     });
+
     if (!userDrawings) {
       throw new Error("No drawings found for this user");
     }
     return NextResponse.json({
       success: true,
       msg: ["User drawings retrieved successfully"],
-      data: userDrawings,
+      data: userDrawingsWithBlurredUrl,
       count: userDrawingCount,
     });
   } catch (error: any) {

@@ -3,13 +3,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { FormProvider, useForm } from "react-hook-form";
 import { BsBrush } from "react-icons/bs";
-import { FaSpinner } from "react-icons/fa";
 import { FaRegCircle } from "react-icons/fa6";
 import { RiEraserLine, RiRectangleLine, RiTriangleLine } from "react-icons/ri";
 import { toast } from "react-toastify";
+import { getMe } from "../../actions/auth";
 import { saveDrawings } from "../../actions/drawing";
 import useCanvasTool from "../../helpers/hooks/useCanvas";
-import { getDrawingById, getMe } from "../../helpers/queries/index.client";
+import { getDrawingById } from "../../helpers/queries/index.client";
 import Input from "../Input";
 import InputColors from "../InputColor";
 import InputRowSelect from "../InputRowSelect";
@@ -17,13 +17,24 @@ import InputToggle from "../InputToggle";
 import NextLink from "../NextLink";
 import Typography from "../Typography";
 
-export default function CanvasBoard({ id }: { id: string }) {
-  const { data: me, isLoading: isMeLoading } = useQuery({
+export default function CanvasBoard({
+  id,
+  getMeData,
+  getDrawingByIdData,
+}: {
+  id: string;
+  getMeData: any;
+  getDrawingByIdData: any;
+}) {
+  const { data: me } = useQuery({
     queryKey: ["getMe"],
+    initialData: getMeData,
     queryFn: () => getMe(),
+    staleTime: Infinity,
   });
-  const { data, isLoading } = useQuery({
+  const { data } = useQuery({
     queryKey: ["getDrawingById", id],
+    initialData: getDrawingByIdData,
     queryFn: () => getDrawingById(id),
   });
 
@@ -31,30 +42,36 @@ export default function CanvasBoard({ id }: { id: string }) {
 
   const { mutate, isPending } = useMutation({
     mutationFn: saveDrawings,
-    onMutate: async (values: any) => {
-      await queryClient.cancelQueries({ queryKey: ["getDrawingById", id] });
-      const drawing: any = queryClient.getQueryData(["getDrawingById", id]);
-      const updatedDrawing = {
-        ...drawing,
-        data: { ...drawing.data, url: `canvas/${id}` },
-      };
-
-      queryClient.setQueryData(["getDrawingById", id], updatedDrawing);
-      return updatedDrawing;
-    },
     onError: (error) => {
       toast.error(error.message);
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (!data?.success) {
         toast.error(data?.msg?.[0]);
+      } else {
+        await queryClient.cancelQueries({ queryKey: ["getDrawingById", id] });
+        await queryClient.cancelQueries({
+          queryKey: ["getDrawings"],
+        });
+        const drawing: any = queryClient.getQueryData(["getDrawingById", id]);
+        const updatedDrawing = {
+          ...drawing,
+          data: { ...drawing.data, url: `canvas/${id}` },
+        };
+        const drawings: any = queryClient.getQueryData(["getDrawings"]);
+
+        queryClient.setQueryData(["getDrawings"], {
+          ...drawings,
+          pages: drawings.pages.map((page: any) => ({
+            ...page,
+            data: page.data.map((drawing: any) =>
+              drawing.drawing.id === id ? { drawing: updatedDrawing } : drawing
+            ),
+          })),
+        });
+
+        queryClient.setQueryData(["getDrawingById", id], updatedDrawing);
       }
-      // else {
-      //   toast.success(data?.msg?.[0]);
-      // }
-    },
-    onSettled() {
-      queryClient.invalidateQueries({ queryKey: ["getDrawingById", id] });
     },
   });
 
@@ -83,11 +100,10 @@ export default function CanvasBoard({ id }: { id: string }) {
 
   return (
     <div ref={containerRef} className={`bg-white cursor-crosshair relative`}>
-      {(isLoading || isMeLoading || isCanvasLoading) && (
-        <FaSpinner
-          size={100}
-          className="spinner-icon animate-spin fixed m-auto left-0 right-0 top-0 bottom-0"
-        />
+      {isCanvasLoading && (
+        <div className="fixed m-auto left-0 right-0 top-0 bottom-0 flex items-center justify-center">
+          <Typography className="">SYNCING...</Typography>
+        </div>
       )}
       <>
         <div className="fixed left-4 top-4 ">
@@ -95,7 +111,10 @@ export default function CanvasBoard({ id }: { id: string }) {
           <Typography p>
             {isConnected ? "Is connected" : "Not connected"}
           </Typography>
-          <NextLink href={`/drawings`}>Go Back</NextLink>
+          <NextLink href={`/drawings`} scroll={false}>
+            Go Back
+          </NextLink>
+          {isPending && <Typography p>Saving...</Typography>}
         </div>
         <div className="flex justify-between align-center gap-4 z-10 fixed right-4 top-4 bg-background rounded-lg">
           <FormProvider {...methods}>

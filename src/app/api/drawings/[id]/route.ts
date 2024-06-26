@@ -28,7 +28,7 @@ export const GET = async (
     }
     const userDrawings = await prisma.drawing.findUnique({
       where: {
-        id: id,
+        id: Number(id),
       },
       include: {
         users: true,

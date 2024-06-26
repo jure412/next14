@@ -14,9 +14,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <Container>
+    <>
       <Header />
-      {children}
-    </Container>
+      <Container className="flex flex-col">
+        <div className="h-14"></div>
+        {children}
+      </Container>
+    </>
   );
 }

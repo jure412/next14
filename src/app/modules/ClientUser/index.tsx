@@ -2,19 +2,27 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { FaSpinner } from "react-icons/fa";
+import { getMe } from "../../actions/auth";
 import Typography from "../../components/Typography";
-import { getMe } from "../../helpers/queries/index.client";
 
-export default function ClientUser({ id }: { id?: string }) {
-  const { data, isLoading } = useQuery({
+export default function ClientUser({
+  id,
+  getMeData,
+}: {
+  id?: string;
+  getMeData: any;
+}) {
+  const { data, isLoading, isRefetching, isFetching } = useQuery({
     queryKey: ["getMe"],
+    initialData: getMeData,
     queryFn: () => getMe(),
+    staleTime: Infinity,
   });
 
   return (
     <div
       id={id ?? ""}
-      className="w-fit	 bg-white rounded-lg shadow-primary overflow-hidden my-3"
+      className="w-fit bg-white rounded-lg shadow-primary overflow-hidden my-3"
     >
       {isLoading ? (
         <FaSpinner size={20} className="spinner-icon animate-spin" />

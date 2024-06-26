@@ -1,18 +1,13 @@
 "use client";
 import Image, { ImageProps } from "next/image";
-import React, { useState } from "react";
+import React from "react";
 
-const CustomImage: React.FC<ImageProps> = ({ className, alt, ...rest }) => {
-  const [isImageLoading, setImageLoading] = useState(true);
-
+const CustomImage: React.FC<ImageProps> = ({ className, ...rest }) => {
   return (
     <Image
       {...rest}
-      alt={alt}
-      className={`rounded-lg mx-auto ${className ?? ""} ${
-        isImageLoading ? "blur-sm" : ""
-      }`}
-      onLoad={() => setImageLoading(false)}
+      className={`rounded-lg mx-auto ${className ?? ""}`}
+      alt={rest.alt}
     />
   );
 };

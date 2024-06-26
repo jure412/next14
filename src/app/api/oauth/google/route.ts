@@ -35,7 +35,7 @@ export const GET = async (req: NextRequest) => {
       throw new Error("State does not match");
     }
 
-    const { accessToken, idToken, accessTokenExpiresAt, refreshToken } =
+    const { accessToken, accessTokenExpiresAt, refreshToken } =
       await google.validateAuthorizationCode(code, codeVerifier);
 
     const googleRes = await fetch(
@@ -140,11 +140,9 @@ export const GET = async (req: NextRequest) => {
       expires: new Date(0),
     });
 
-    // return Response.json({
-    //   msg: ["hey"],
-    //   success: false,
-    // });
-    return NextResponse.redirect(new URL("/", process.env.NEXTAUTH_URL), {
+    cookies().set("isOauth", "true", { httpOnly: true });
+
+    return NextResponse.redirect(new URL("/", process.env.APP_URL), {
       status: 302,
     });
   } catch (error: any) {

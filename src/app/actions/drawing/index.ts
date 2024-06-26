@@ -84,18 +84,18 @@ export const newDrawing = async ({ name, users }: NewDrawingsValuesProps) => {
 
 export const saveDrawings = async (formData: FormData) => {
   try {
-    const canvas: any = formData.get("canvas");
-    const drawignId: any = formData.get("drawingId");
-    if (!canvas || !drawignId) {
+    const canvas: File = formData.get("canvas") as File;
+    const drawingId: number = Number(formData.get("drawingId"));
+    if (!canvas || !drawingId) {
       throw new Error("Something is wrong.");
     }
 
     const imagePath: string | null = canvas
-      ? await saveBase64ImageToFile(canvas, drawignId)
+      ? await saveBase64ImageToFile(canvas, drawingId)
       : null;
     const drawing = await prisma.drawing.update({
       where: {
-        id: drawignId as string,
+        id: drawingId,
       },
       data: {
         url: imagePath,

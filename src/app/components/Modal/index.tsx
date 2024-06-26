@@ -25,7 +25,7 @@ export default function Modal({
   const modal =
     mounted && isOpen
       ? createPortal(
-          <div className="fixed top-1 w-screen flex items-center justify-center h-screen bg-primary-light/75">
+          <div className="fixed top-1 w-screen flex items-center justify-center h-screen bg-primary-light/75 z-30">
             <div className="relative bg-white rounded-lg text-left overflow-hidden shadow-primary transform transition-all sm:max-w-lg w-full mx-6">
               <Link
                 className="absolute right-6 top-6"

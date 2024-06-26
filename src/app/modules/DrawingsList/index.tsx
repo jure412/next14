@@ -7,11 +7,19 @@ import Typography from "../../components/Typography";
 import { getDrawings } from "../../helpers/queries/index.client";
 import Card from "../Card";
 import ScrollToEndComponent from "../ScrollToEndComponent";
+
 const initialPageParam = { skip: 0, take: 24 };
-export default function DrawingsList() {
-  const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } =
+
+export default function DrawingsList({
+  getDrawingsData,
+}: {
+  getDrawingsData: any;
+}) {
+  const { data, isRefetching, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useInfiniteQuery({
       queryKey: ["getDrawings"],
+      refetchOnMount: false,
+      initialData: { pages: [getDrawingsData], pageParams: [initialPageParam] },
       queryFn: ({ pageParam }) => getDrawings(pageParam),
       initialPageParam: initialPageParam,
       getNextPageParam: (lastParams, allParmas) => {
@@ -35,19 +43,20 @@ export default function DrawingsList() {
 
   return (
     <>
-      {isLoading ? (
-        <div className="fixed  inset-0 flex items-center justify-center">
+      {!isFetchingNextPage && isRefetching && (
+        <div className="fixed h-14 left-0 top-14 w-full flex justify-center mt-4 z-10">
           <FaSpinner size={40} className="spinner-icon animate-spin" />
         </div>
-      ) : data?.pages[0].count > 0 ? (
+      )}
+      {data?.pages[0].count > 0 ? (
         <ScrollToEndComponent onScrollToEnd={handleScrollToEndDebouncer}>
           {data?.pages?.map((pages: any) =>
-            pages?.data.map((drawing: any, i: number) => (
+            pages?.data?.map((drawing: any, i: number) => (
               <Card item={drawing?.drawing} key={i} />
             ))
           )}
           {isFetchingNextPage && (
-            <div className="fixed h-14 bottom-0 w-full flex justify-center mt-4">
+            <div className="fixed h-14 left-0 bottom-0 w-full flex justify-center mt-4">
               <FaSpinner size={40} className="spinner-icon animate-spin" />
             </div>
           )}

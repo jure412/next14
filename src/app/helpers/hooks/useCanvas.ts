@@ -312,7 +312,7 @@ const useCanvasTool = ({
         if (disconectedUser[0] === meId) {
           setIsConnected(false);
         } else {
-          toast.info(`User left the room.`);
+          // toast.info(`User left the room.`);
         }
       });
 
@@ -334,7 +334,7 @@ const useCanvasTool = ({
       const image = new Image();
       image.src =
         snap ??
-        `${process.env.NEXTAUTH_URL}/api/assets/${url.replace(
+        `${process.env.APP_URL}/api/assets/${url.replace(
           "canvas/",
           ""
         )}?=${new Date().getTime()}`;
@@ -358,7 +358,8 @@ const useCanvasTool = ({
     };
 
     if (!startSyncing) {
-      if (url === "") {
+      if (url === undefined) {
+        console.log("startSyncing", url);
         createImage();
       } else {
         setImage();
