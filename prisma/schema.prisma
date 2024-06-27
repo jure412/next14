@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("POSTGRES_PRISMA_URL")
+  url      = env("POSTGRES_URL")
 }
 
 model User {
@@ -19,6 +19,7 @@ model User {
   emailVerification EmailVerification[]
   oAuth             OAauth[]
   drawing           UserDrawing[] 
+  createdAt        DateTime           @default(now())
 }
 
 model Session {
@@ -48,14 +49,16 @@ model OAauth {
 }
 
 model Drawing {
-  id     String   @id @default(cuid())
-  url    String?  @default("")
+  id     Int       @id @default(autoincrement())
+  url    String?   @default("")
   name   String
   users  UserDrawing[] 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt    @default(now())
 }
 
 model UserDrawing {
-  drawingId  String
+  drawingId  Int
   userId  String
   user    User  @relation(references: [id], fields: [userId])
   drawing Drawing  @relation(references: [id], fields: [drawingId])

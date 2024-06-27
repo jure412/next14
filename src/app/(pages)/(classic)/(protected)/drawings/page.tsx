@@ -1,28 +1,24 @@
-import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { MdDraw } from "react-icons/md";
 import { LinkVariant } from "../../../../components/Link/index.types";
 import Modal from "../../../../components/Modal";
 import { getDrawings } from "../../../../helpers/queries/index.client";
 import DrawingsList from "../../../../modules/DrawingsList";
 import NewDrawing from "../../../../modules/ModalContent/NewDrawing";
-import { getQueryClient } from "../../../../providers/PrefetchData.provider";
 
 const Page = async () => {
-  const queryClient = getQueryClient();
-  await queryClient.prefetchInfiniteQuery({
-    queryKey: ["getDrawings"],
-    queryFn: () =>
-      getDrawings({
-        url: `${process.env.NEXTAUTH_URL}/api/drawings`,
-        options: {
-          headers: headers(),
-        },
-        skip: 0,
-        take: 24,
-      }),
-    initialPageParam: { skip: 0, take: 24 },
+  const getDrawingsData = await getDrawings({
+    url: `${process.env.APP_URL}/api/drawings`,
+    options: {
+      headers: headers(),
+    },
+    skip: 0,
+    take: 24,
   });
+  if (!getDrawingsData.success) {
+    redirect("/");
+  }
   return (
     <div>
       <div className="flex gap-4 flex-col">
@@ -36,9 +32,7 @@ const Page = async () => {
           </Modal>
         </div>
         <div className="grid 2xl:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 gap-4 mb-4">
-          <HydrationBoundary state={dehydrate(queryClient)}>
-            <DrawingsList />
-          </HydrationBoundary>
+          <DrawingsList getDrawingsData={getDrawingsData} />
         </div>
       </div>
     </div>

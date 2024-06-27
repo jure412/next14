@@ -1,23 +1,49 @@
-import { HydrationBoundary, dehydrate } from "@tanstack/react-query";
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { getMe } from "../../../../actions/auth";
 import CanvasBoard from "../../../../components/CanvasBoard";
+import Container from "../../../../components/Container";
+import { LinkVariant } from "../../../../components/Link/index.types";
+import NextLink from "../../../../components/NextLink";
+import Typography from "../../../../components/Typography";
+import { isMobileDevice } from "../../../../helpers/functions/server";
 import { getDrawingById } from "../../../../helpers/queries/index.client";
-import { getQueryClient } from "../../../../providers/PrefetchData.provider";
 
 const Page = async ({ params }: { params: { id: string } }) => {
-  const queryClient = getQueryClient();
-  await queryClient.prefetchQuery({
-    queryKey: ["getDrawingById", params.id],
-    queryFn: () =>
-      getDrawingById(params.id, process.env.NEXTAUTH_URL + "/api/drawings/", {
-        headers: headers(),
-      }),
-  });
+  if (await isMobileDevice()) {
+    return (
+      <Container className="my-4">
+        <Typography h1>Mobile devices are not supported</Typography>
+        <NextLink
+          className="my-8"
+          prefetch={false}
+          variant={LinkVariant.SECONDARY}
+          href="/"
+          scroll={false}
+        >
+          Go home
+        </NextLink>
+      </Container>
+    );
+  }
+  const getMeData = await getMe();
+  const getDrawingByIdData = await getDrawingById(
+    params.id,
+    process.env.APP_URL + "/api/drawings/",
+    {
+      headers: headers(),
+    }
+  );
 
+  if (!getDrawingByIdData.success) {
+    redirect("/");
+  }
   return (
-    <HydrationBoundary state={dehydrate(queryClient)}>
-      <CanvasBoard id={params.id} />
-    </HydrationBoundary>
+    <CanvasBoard
+      getMeData={getMeData}
+      getDrawingByIdData={getDrawingByIdData}
+      id={params.id}
+    />
   );
 };
 

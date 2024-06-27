@@ -198,8 +198,8 @@ const useCanvasTool = ({
 
     const handleMouseDown = (e: MouseEvent) => {
       if (ctx?.isDrawing) return;
-      const id = short.generate();
-      ctx.drawingId = id;
+      const drawignId = short.generate();
+      ctx.drawingId = drawignId;
       drawingStart(
         e as MouseEvent,
         brushWidth,
@@ -208,7 +208,8 @@ const useCanvasTool = ({
         fillColor
       );
       socket.emit("draw-start", {
-        drawignId: id,
+        roomId: id,
+        drawignId: drawignId,
         offsetX: e.offsetX,
         offsetY: e.offsetY,
         brushWidth,
@@ -308,22 +309,14 @@ const useCanvasTool = ({
         drawingEnd();
       });
 
-      socket.on("user-disconnected", (disconectedUser) => {
-        if (disconectedUser[0] === meId) {
-          setIsConnected(false);
-        } else {
-          toast.info(`User left the room.`);
-        }
-      });
-
       return () => {
-        socket.emit("handle-disconnect");
-        socket.off("user-disconnected");
+        socket.emit("handle-disconnect", { roomId: id });
         socket.off("syncing-canvas");
         socket.off("join-room");
         socket.off("draw-start");
         socket.off("drawing");
         socket.off("draw-end");
+        socket.off("handle-disconnect");
       };
     }
   }, [startSyncing]);
@@ -334,7 +327,7 @@ const useCanvasTool = ({
       const image = new Image();
       image.src =
         snap ??
-        `${process.env.NEXTAUTH_URL}/api/assets/${url.replace(
+        `${process.env.APP_URL}/api/assets/${url.replace(
           "canvas/",
           ""
         )}?=${new Date().getTime()}`;

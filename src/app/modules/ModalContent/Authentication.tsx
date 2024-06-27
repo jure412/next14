@@ -26,8 +26,8 @@ const singUpValues: Values = {
 };
 
 const singInValues: Values = {
-  password: "",
-  email: "",
+  password: "12345678",
+  email: "jc-playground+1@gmail.com",
 };
 
 const ResendValues: Values = {
@@ -68,7 +68,10 @@ const Authentication: React.FC<AuthenticationProps> = ({
       }
     },
     onSettled() {
-      step === 1 && queryClient.invalidateQueries({ queryKey: ["getMe"] });
+      step === 1 &&
+        queryClient.invalidateQueries({
+          queryKey: ["getMe"],
+        });
     },
   });
 

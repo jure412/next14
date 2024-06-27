@@ -4,6 +4,7 @@ import * as argon2 from "argon2";
 import jwt from "jsonwebtoken";
 import { generateId } from "lucia";
 import { cookies } from "next/headers";
+import { cache } from "react";
 import { prisma } from "../../../../prisma/prismaClient";
 import { lucia } from "../../../../utils/auth";
 import { sendEmail } from "../../../../utils/email";
@@ -14,6 +15,50 @@ import {
   SignInSchema,
   SignUpSchema,
 } from "./index.validation";
+
+export const getMe = cache(async () => {
+  const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
+  if (!sessionId)
+    return {
+      msg: ["User not found."],
+      success: false,
+      isAuth: false,
+    };
+
+  const { user, session } = await lucia.validateSession(sessionId);
+  const isOauth = cookies().get("isOauth");
+  try {
+    if (session && session.fresh && !isOauth) {
+      cookies().delete("isOauth");
+      const sessionCookie = lucia.createSessionCookie(session.id);
+      cookies().set(
+        sessionCookie.name,
+        sessionCookie.value,
+        sessionCookie.attributes
+      );
+    }
+    if (!session) {
+      const sessionCookie = lucia.createBlankSessionCookie();
+      cookies().set(
+        sessionCookie.name,
+        sessionCookie.value,
+        sessionCookie.attributes
+      );
+    }
+  } catch (e) {
+    return {
+      msg: [e.message],
+      success: false,
+      isAuth: false,
+    };
+  }
+  return {
+    msg: ["User found."],
+    success: true,
+    isAuth: true,
+    data: { user },
+  };
+});
 
 export const resendVerificationEmail = async (email: string) => {
   try {
@@ -83,7 +128,7 @@ export const resendVerificationEmail = async (email: string) => {
       }
     );
 
-    const url = `${process.env.NEXTAUTH_URL}/verify-email?token=${token}`;
+    const url = `${process.env.APP_URL}/verify-email?token=${token}`;
     await sendEmail({
       html: `<a href="${url}">Verify your email</a>`,
       subject: "Verify your email",
@@ -138,7 +183,7 @@ export const signUp = async (values: Values) => {
       }
     );
 
-    const url = `${process.env.NEXTAUTH_URL}/verify-email?token=${token}`;
+    const url = `${process.env.APP_URL}/verify-email?token=${token}`;
 
     await sendEmail({
       html: `<a href="${url}">Verify your email</a>`,
@@ -206,12 +251,10 @@ export const signIn = async (values: any) => {
     );
 
     return {
-      success: true,
       msg: ["User logged in successfully."],
-      data: {
-        ...user,
-        sessionId: sessionCookie.value,
-      },
+      success: true,
+      isAuth: true,
+      data: { user },
     };
   } catch (error: any) {
     return { msg: [error.message], success: false };
@@ -236,6 +279,8 @@ export const signOut = async () => {
       sessionCookie.attributes
     );
 
+    // revalidatePath("/drawings");
+
     return {
       success: true,
       msg: ["User logged out successfully."],
@@ -245,6 +290,7 @@ export const signOut = async () => {
   }
 };
 
+// create
 export const createGoogleAuthorizationURL = async () => {
   try {
     const state = generateState();

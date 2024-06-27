@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // child_process: "empty",
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.externals = config.externals || [];
@@ -8,12 +9,13 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: [process.env.NEXTAUTH_URL],
+    domains: [process.env.APP_URL],
     unoptimized: true,
   },
   env: {
-    NEXTAUTH_URL: process.env.NEXTAUTH_URL,
+    APP_URL: process.env.APP_URL,
   },
+  output: "standalone",
 };
 
 export default nextConfig;

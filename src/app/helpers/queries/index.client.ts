@@ -12,7 +12,9 @@ export const getDrawings = async ({
   const response = options
     ? await fetch(`${url}?skip=${skip}&take=${take}`, options)
     : await fetch(`${url}?skip=${skip}&take=${take}`);
+
   const drawings = await response.json();
+
   return drawings;
 };
 
@@ -26,15 +28,6 @@ export const getDrawingById = async (
     : await fetch(url + id);
   const drawing = await response.json();
   return drawing;
-};
-
-export const getMe = async (
-  url: string = "/api/user",
-  options?: RequestInit
-): Promise<any> => {
-  const response = options ? await fetch(url, options) : await fetch(url);
-  const me = await response.json();
-  return me;
 };
 
 export const getUserById = async (

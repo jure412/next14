@@ -3,8 +3,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 import "./globals.css";
-import Provider from "./providers/index.provider";
-import { Redirect } from "./providers/Redirect.provider";
+import QueryProvider from "./providers/Query.provider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,10 +21,10 @@ export default async function RootLayout({
         suppressHydrationWarning={true}
         className={`bg-background relative`}
       >
-        <Provider>
-          <Redirect>{children}</Redirect>
+        <QueryProvider>
+          {children}
           <ToastContainer />
-        </Provider>
+        </QueryProvider>
       </body>
     </html>
   );
