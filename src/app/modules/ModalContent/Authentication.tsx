@@ -26,8 +26,8 @@ const singUpValues: Values = {
 };
 
 const singInValues: Values = {
-  password: "12345678",
-  email: "jc-playground+1@gmail.com",
+  password: "",
+  email: "",
 };
 
 const ResendValues: Values = {
