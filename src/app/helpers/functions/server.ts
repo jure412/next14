@@ -5,7 +5,7 @@ import path from "path";
 import { getPlaiceholder } from "plaiceholder";
 import { UAParser } from "ua-parser-js";
 
-export const isMobileDevice = () => {
+export const isMobileDevice = async () => {
   if (typeof process === "undefined") {
     throw new Error(
       "[Server method] you are importing a server-only module outside of server"
@@ -51,7 +51,7 @@ export const saveBase64ImageToFile = (
   });
 };
 
-export async function iteratorToStream(iterator: any) {
+export const iteratorToStream = (iterator: any) => {
   return new ReadableStream({
     async pull(controller) {
       const { value, done } = await iterator.next();
@@ -62,7 +62,7 @@ export async function iteratorToStream(iterator: any) {
       }
     },
   });
-}
+};
 
 export async function* nodeStreamToIterator(stream: fs.ReadStream) {
   for await (const chunk of stream) {
@@ -70,7 +70,7 @@ export async function* nodeStreamToIterator(stream: fs.ReadStream) {
   }
 }
 
-export async function getBase64(imageUrl: string) {
+export const getBase64 = async (imageUrl: string) => {
   try {
     const res = await fetch(imageUrl, { headers: headers() });
 
@@ -84,12 +84,12 @@ export async function getBase64(imageUrl: string) {
   } catch (e) {
     if (e instanceof Error) console.log(e.stack);
   }
-}
+};
 
-export async function addBlurredDataUrls(
+export const addBlurredDataUrls = async (
   data: any,
   nestedProps: string
-): Promise<any[]> {
+): Promise<any[]> => {
   const nestedPropsArray = nestedProps.split(".");
   const base64Promises = data.map((item) => {
     const url = item[nestedPropsArray[0]][nestedPropsArray[1]]
@@ -107,4 +107,4 @@ export async function addBlurredDataUrls(
   });
 
   return photosWithBlur;
-}
+};
