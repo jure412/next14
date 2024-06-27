@@ -61,9 +61,7 @@ export async function getBase64(imageUrl: string) {
     if (!res.ok) {
       throw new Error(`Failed to fetch image: ${res.status} ${res.statusText}`);
     }
-
     const buffer = await res.arrayBuffer();
-
     const { base64 } = await getPlaiceholder(Buffer.from(buffer));
 
     return base64;
@@ -84,10 +82,9 @@ export async function addBlurredDataUrls(
           "/api/assets"
         )
       : null;
-    return getBase64(process.env.APP_URL + url);
+    return url ? getBase64(process.env.APP_URL + url) : null;
   });
   const base64Results = await Promise.all(base64Promises);
-
   const photosWithBlur: any[] = data.map((item, i) => {
     item[nestedPropsArray[0]]["blurDataURL"] = base64Results[i];
     return item;

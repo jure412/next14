@@ -50,7 +50,7 @@ export default function CanvasBoard({
         toast.error(data?.msg?.[0]);
       } else {
         await queryClient.cancelQueries({ queryKey: ["getDrawingById", id] });
-        await queryClient.cancelQueries({
+        queryClient.removeQueries({
           queryKey: ["getDrawings"],
         });
         const drawing: any = queryClient.getQueryData(["getDrawingById", id]);
@@ -58,18 +58,6 @@ export default function CanvasBoard({
           ...drawing,
           data: { ...drawing.data, url: `canvas/${id}` },
         };
-        const drawings: any = queryClient.getQueryData(["getDrawings"]);
-
-        queryClient.setQueryData(["getDrawings"], {
-          ...drawings,
-          pages: drawings.pages.map((page: any) => ({
-            ...page,
-            data: page.data.map((drawing: any) =>
-              drawing.drawing.id === id ? { drawing: updatedDrawing } : drawing
-            ),
-          })),
-        });
-
         queryClient.setQueryData(["getDrawingById", id], updatedDrawing);
       }
     },
