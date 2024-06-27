@@ -17,7 +17,7 @@ export default async function RootLayout({
     <>
       <Header />
       <Container className="flex flex-col">
-        <div className="h-14"></div>
+        <div className="h-15"></div>
         {children}
       </Container>
     </>

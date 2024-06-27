@@ -29,7 +29,7 @@ export async function GET(req: NextRequest, res: NextResponse & GetProps) {
     const stats = await fsPromises.stat(filepath);
 
     const nodeStream = createReadStream(filepath);
-    const stream: ReadableStream = iteratorToStream(
+    const stream: ReadableStream = await iteratorToStream(
       nodeStreamToIterator(nodeStream)
     );
     const mimetype = mime.getType(filepath);

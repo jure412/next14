@@ -1,7 +1,23 @@
+"use server";
 import fs from "fs";
 import { headers } from "next/headers";
 import path from "path";
 import { getPlaiceholder } from "plaiceholder";
+import { UAParser } from "ua-parser-js";
+
+export const isMobileDevice = () => {
+  if (typeof process === "undefined") {
+    throw new Error(
+      "[Server method] you are importing a server-only module outside of server"
+    );
+  }
+  const { get } = headers();
+  const ua = get("user-agent");
+
+  const device = new UAParser(ua || "").getDevice();
+
+  return device.type === "mobile";
+};
 
 export const saveBase64ImageToFile = (
   base64Image: File,
@@ -35,7 +51,7 @@ export const saveBase64ImageToFile = (
   });
 };
 
-export function iteratorToStream(iterator: any) {
+export async function iteratorToStream(iterator: any) {
   return new ReadableStream({
     async pull(controller) {
       const { value, done } = await iterator.next();

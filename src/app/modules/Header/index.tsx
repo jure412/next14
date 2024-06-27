@@ -9,7 +9,7 @@ import ClientHeader from "./clientHeader";
 const Header: React.FC = async () => {
   const getMeData = await getMe();
   return (
-    <header className="fixed left-0 z-10 w-full bg-background">
+    <header className="fixed left-0 z-10 w-full bg-background  shadow-primary">
       <Container>
         <div className="h-14 flex items-center justify-between">
           <NextLink
