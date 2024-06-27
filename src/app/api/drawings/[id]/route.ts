@@ -16,6 +16,9 @@ export const GET = async (
     if (!sessionId) {
       throw new Error("No sessionId found");
     }
+    if (!id) {
+      throw new Error("No id provided");
+    }
     const sessionUser = await prisma.session.findUnique({
       where: { id: sessionId },
     });
@@ -23,26 +26,23 @@ export const GET = async (
       throw new Error("No user found");
     }
 
-    if (!id) {
-      throw new Error("No id provided");
-    }
-    const userDrawings = await prisma.drawing.findUnique({
+    const userDrawings = await prisma.userDrawing.findFirst({
       where: {
-        id: Number(id),
+        drawingId: Number(id),
+        userId: sessionUser.userId,
       },
       include: {
-        users: true,
+        drawing: true,
       },
     });
 
     if (!userDrawings) {
       throw new Error("No drawings found for this user");
     }
-
     return NextResponse.json({
       success: true,
-      msg: ["No drawings retrieved successfully"],
-      data: userDrawings,
+      msg: ["Successfully fetched drawing"],
+      data: userDrawings.drawing,
     });
   } catch (error: any) {
     return NextResponse.json({

@@ -1,11 +1,12 @@
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { getMe } from "../../../../actions/auth";
 import CanvasBoard from "../../../../components/CanvasBoard";
 import { getDrawingById } from "../../../../helpers/queries/index.client";
 
 const Page = async ({ params }: { params: { id: string } }) => {
-  const getMeData = getMe();
-  const getDrawingByIdData = getDrawingById(
+  const getMeData = await getMe();
+  const getDrawingByIdData = await getDrawingById(
     params.id,
     process.env.APP_URL + "/api/drawings/",
     {
@@ -13,6 +14,9 @@ const Page = async ({ params }: { params: { id: string } }) => {
     }
   );
 
+  if (!getDrawingByIdData.success) {
+    redirect("/");
+  }
   return (
     <CanvasBoard
       getMeData={getMeData}

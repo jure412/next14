@@ -1,6 +1,5 @@
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-// import { addBlurredDataUrls } from "../../(pages)/(classic)/fn";
 import { prisma } from "../../../../prisma/prismaClient";
 import { addBlurredDataUrls } from "../../helpers/functions/server";
 
@@ -37,7 +36,6 @@ export const GET = async (req: NextRequest) => {
       take: take,
       include: {
         drawing: true,
-        user: true,
       },
     });
     const userDrawingsWithBlurredUrl = await addBlurredDataUrls(

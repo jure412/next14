@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  child_process: "empty",
+  // child_process: "empty",
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.externals = config.externals || [];

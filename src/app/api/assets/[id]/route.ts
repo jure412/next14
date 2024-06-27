@@ -41,7 +41,7 @@ export async function GET(req: NextRequest, res: NextResponse & GetProps) {
         )}`,
         "content-type": mimetype || "application/octet-stream",
         "content-length": stats.size + "",
-        // "cache-control": "public, max-age=31536000, immutable",
+        "cache-control": "private, no-cache, no-store, must-revalidate",
       }),
     });
   } catch (error: any) {

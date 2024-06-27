@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { redirect } from "next/navigation";
 import { MdDraw } from "react-icons/md";
 import { LinkVariant } from "../../../../components/Link/index.types";
 import Modal from "../../../../components/Modal";
@@ -15,6 +16,9 @@ const Page = async () => {
     skip: 0,
     take: 24,
   });
+  if (!getDrawingsData.success) {
+    redirect("/");
+  }
   return (
     <div>
       <div className="flex gap-4 flex-col">
